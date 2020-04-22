@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Apr 21, 2020 5:43:26 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1587509006025</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>Apr 21, 2020 7:45:17 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1587516317293</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>C:\Users\ianru\.c++\ece385-gif-decoder\gifplayer_1.0\software\console_renderer_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\gifplayer_soc.sopcinfo</SopcDesignFile>
