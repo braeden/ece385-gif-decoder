@@ -6,7 +6,7 @@
 
 // Header (6 bytes)
 typedef struct __packed__ {
-	unsigned char sig[3];
+	unsigned char signature[3];
 	unsigned char version[3];
 } HeaderBlock;
 

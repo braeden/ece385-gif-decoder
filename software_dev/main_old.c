@@ -167,6 +167,7 @@ int main() {
 	LSD descriptor;
 	fread(&header, 1, sizeof(header), fileptr);
 	fread(&descriptor, 1, sizeof(descriptor), fileptr);
+	printf("%02x\n", sizeof(header));
 	for (int i = 0; i < 3; i++) {
 		assert(header.signature[i] == VALID_HEADER[i]);
 	}
@@ -180,14 +181,14 @@ int main() {
 	//Read global color table and print it
 	fread(globalTable, 3, readlGlobalColorSize, fileptr);
 
-	// for (int i = 0; i < readlGlobalColorSize; i++) {
-	// 	printf("[#");
-	// 	for (int j = 0; j < 3; j++) {
-	// 		printf("%02x", globalTable[i].RGB[j]);
-	// 	}
-	// 	printf("],");
-	// }
-	// printf("\n");
+	for (int i = 0; i < readlGlobalColorSize; i++) {
+		printf("[#");
+		for (int j = 0; j < 3; j++) {
+			printf("%02x", globalTable[i].RGB[j]);
+		}
+		printf("],");
+	}
+	printf("\n");
 
 	//Now let's load our images
 	while (1) {

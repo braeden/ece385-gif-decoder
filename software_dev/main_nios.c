@@ -40,19 +40,19 @@ int main() {
 	checkPacked();
 
 	//Open file locally:
-	// FILE *f = fopen("sample1.gif", "rb");
-	// fseek(f, 0, SEEK_END);
-	// long fsize = ftell(f);
-	// fseek(f, 0, SEEK_SET);
+	FILE *f = fopen("sample1.gif", "rb");
+	fseek(f, 0, SEEK_END);
+	long fsize = ftell(f);
+	fseek(f, 0, SEEK_SET);
 
-	// fileptr = malloc(fsize + 1);
-	// fread(fileptr, 1, fsize, f);
-	// fclose(f);
+	fileptr = malloc(fsize + 1);
+	fread(fileptr, 1, fsize, f);
+	fclose(f);
 
 	////////////////////////////////////////////
 
 	//Set pointer from SRAM
-	fileptr = 0x00400002;
+	// fileptr = 0x00400002;
 
 	HeaderBlock header;
 	LSD descriptor;
