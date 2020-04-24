@@ -59,11 +59,7 @@ typedef struct imageDescriptor {
 #pragma pack(pop)
 
 // Subblock w/ size and array of chars w/ variable wize
-typedef struct dictionary_entry_t {
-	unsigned char byte;
-	int prev;
-	int len;
-} dictionary_entry_t;
+
 
 typedef struct colorTableEntry {
 	unsigned char RGB[3];

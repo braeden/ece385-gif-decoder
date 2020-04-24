@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "lzw.h"
 #include "structs.h"
 
 static char VALID_HEADER[3] = "GIF";
@@ -158,22 +159,26 @@ int main() {
 			bytesInSubblock = getch(fileptr);
 			fileptr++;
 		}
-
-		// for (int i = 0; i < dataSize; i++) {
-		// 	printf("%02x,", data[i]);
-		// }
-		// unsigned char *dataOut = malloc(imgDesc.imgHeight * imgDesc.imgWidth);
-
+//
+		for (int i = 0; i < dataSize; i++) {
+			printf("%02x,", data[i]);
+			if (!(i%10)) {
+				printf("\n");
+			}
+		}
+		printf("\n");
+		unsigned char *dataOut = malloc(imgDesc.imgHeight * imgDesc.imgWidth);
+//
 		// // Write developed image frame to some sort of storage
-		// uncompress(LZWMinCode, data, dataSize, dataOut);
-		// for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
-		// 	if (i % imgDesc.imgWidth == 0) {
-		// 		printf("\n");
-		// 	}
-		// 	printf("\033[38;5;%dm", dataOut[i]);
-		// 	printf("%02x ", dataOut[i]);
-		// 	printf("\033[0m");
-		// }
+		 uncompress(LZWMinCode, data, dataSize, dataOut);
+		 for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
+		 	if (i % imgDesc.imgWidth == 0) {
+		 		printf("\n");
+		 	}
+//		 	printf("\033[38;5;%dm", dataOut[i]);
+		 	printf("%02x ", dataOut[i]);
+//		 	printf("\033[0m");
+		 }
 
 		// Here we have completed image data
 		// We should write: check if localColorFlag then use that to grab colors from data[i]
