@@ -45,7 +45,7 @@ void uncompress(int32_t code_length,
 	for (dictionary_ind = 0;
 		 dictionary_ind < (1 << code_length);
 		 dictionary_ind++) {
-		printf("setup dictionary start\n");
+//		printf("setup dictionary start\n");
 		dictionary[dictionary_ind].byte = dictionary_ind;
 		// XXX this only works because prev is a 32-bit int32_t (> 12 bits)
 		dictionary[dictionary_ind].prev = -1;
@@ -58,18 +58,18 @@ void uncompress(int32_t code_length,
 
 	// TODO verify that the very last byte is clear_code + 1
 	while (input_length) {
-		printf("main loop | code_length: %d\n", code_length);
+//		printf("main loop | code_length: %d\n", code_length);
 		code = 0x0;
 		// Always read one more bit than the code length
 		for (i = 0; i < (code_length + 1); i++) {
 			// This is different than in the file read example; that
 			// was a call to "next_bit"
-
-			 printf("    new code:    %02x\n", code);
-			 printf("    mask:        %02x\n", mask);
-			 printf("    bit:         %02x\n", bit);
-			 printf("    input:       %02x\n", *input);
-
+//
+//			 printf("    new code:    %02x\n", code);
+//			 printf("    mask:        %02x\n", mask);
+//			 printf("    bit:         %02x\n", bit);
+//			 printf("    input:       %02x\n", *input);
+//
 
 			bit = (*input & mask) ? 1 : 0;
 			mask <<= 1;
@@ -82,7 +82,7 @@ void uncompress(int32_t code_length,
 
 			code = code | (bit << i);
 		}
-        printf("new code: %02x\n", code);
+//        printf("new code: %02x\n", code);
 
 
 		if (code == clear_code) {
@@ -113,8 +113,6 @@ void uncompress(int32_t code_length,
 		// Update the dictionary with this character plus the _entry_
 		// (character or string) that came before it
 		if ((prev > -1) && (code_length < 12)) {
-			fprintf(stderr, "code = %.02x, and dictionary_ind = %.02x\n",
-					code, dictionary_ind);
 
 			if (code > dictionary_ind) {
 				fprintf(stderr, "code = %.02x, but dictionary_ind = %.02x\n",

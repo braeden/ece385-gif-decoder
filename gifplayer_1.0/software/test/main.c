@@ -53,7 +53,21 @@ int main() {
 	////////////////////////////////////////////
 
 	//Set pointer from SRAM
-	fileptr = 0x00400002;
+	fileptr = 0x00400050;
+
+//	*fileptr = 0x68;
+//	fileptr++;
+//	*fileptr = 0xA5;
+//	fileptr = 0x00400002;
+
+//	for (int i = 0; i < 1000; i++) {
+//		printf("%02x, ", fileptr[i]);
+//		if (!((i+1)%16)) {
+//			printf("\n");
+//		}
+//	}
+//
+//	exit(0);
 
 	HeaderBlock header;
 	LSD descriptor;
@@ -171,14 +185,14 @@ int main() {
 //
 		// // Write developed image frame to some sort of storage
 		 uncompress(LZWMinCode, data, dataSize, dataOut);
-		 for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
-		 	if (i % imgDesc.imgWidth == 0) {
-		 		printf("\n");
-		 	}
-//		 	printf("\033[38;5;%dm", dataOut[i]);
-		 	printf("%02x ", dataOut[i]);
-//		 	printf("\033[0m");
-		 }
+//		 for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
+//		 	if (i % imgDesc.imgWidth == 0) {
+//		 		printf("\n");
+//		 	}
+////		 	printf("\033[38;5;%dm", dataOut[i]);
+//		 	printf("%02x ", dataOut[i]);
+////		 	printf("\033[0m");
+//		 }
 
 		// Here we have completed image data
 		// We should write: check if localColorFlag then use that to grab colors from data[i]

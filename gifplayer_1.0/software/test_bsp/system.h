@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2_0' in SOPC Builder design 'gifplayer_soc'
  * SOPC Builder design path: ../../gifplayer_soc.sopcinfo
  *
- * Generated: Tue Apr 21 20:04:15 CDT 2020
+ * Generated: Fri Apr 24 20:44:25 CDT 2020
  */
 
 /*
@@ -177,6 +177,14 @@
 #define ALT_STDOUT_PRESENT
 #define ALT_STDOUT_TYPE "altera_avalon_jtag_uart"
 #define ALT_SYSTEM_NAME "gifplayer_soc"
+
+
+/*
+ * altera_hostfs configuration
+ *
+ */
+
+#define ALTERA_HOSTFS_NAME "/mnt/host"
 
 
 /*
