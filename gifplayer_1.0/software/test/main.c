@@ -41,14 +41,22 @@ int main() {
 	checkPacked();
 
 	//Open file locally:
-	// FILE *f = fopen("sample1.gif", "rb");
-	// fseek(f, 0, SEEK_END);
-	// long fsize = ftell(f);
-	// fseek(f, 0, SEEK_SET);
-
-	// fileptr = malloc(fsize + 1);
-	// fread(fileptr, 1, fsize, f);
-	// fclose(f);
+//	printf("here\n");
+//	FILE *f = NULL;
+//	 f = fopen("/mnt/host/sample1.gif", "rb");
+//	 if (f == NULL) {
+//		 printf("File not load !\n");
+//		 exit(0);
+//	 }
+////	 printf("File loaded?\n");
+////	 exit(0);
+//	 fseek(f, 0, SEEK_END);
+//	 long fsize = ftell(f);
+//	 fseek(f, 0, SEEK_SET);
+//
+//	 fileptr = malloc(fsize + 1);
+//	 fread(fileptr, 1, fsize, f);
+//	 fclose(f);
 
 	////////////////////////////////////////////
 
@@ -60,7 +68,7 @@ int main() {
 //	*fileptr = 0xA5;
 //	fileptr = 0x00400002;
 
-//	for (int i = 0; i < 1000; i++) {
+//	for (int i = 0; i < 100; i++) {
 //		printf("%02x, ", fileptr[i]);
 //		if (!((i+1)%16)) {
 //			printf("\n");
