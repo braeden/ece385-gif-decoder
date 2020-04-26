@@ -40,7 +40,7 @@ int main() {
 	checkPacked();
 
 	//Open file locally:
-	FILE *f = fopen("sample1.gif", "rb");
+	FILE *f = fopen("1.gif", "rb");
 	fseek(f, 0, SEEK_END);
 	long fsize = ftell(f);
 	fseek(f, 0, SEEK_SET);
@@ -136,6 +136,7 @@ int main() {
 		fileptr = read(&imgDesc, 1, sizeof(imgDesc), fileptr);
 		assert(imgDesc.imgSeperator == 0x2C);
 		if (imgDesc.packedField.localColorFlag) {
+			printf("Local Color Table\n");
 			// Load a local color table
 			int realLocalColorSize = 0x2 << imgDesc.packedField.localColorSize;	 // 2^(N+1) actual colors
 			localTable = (colorTableEntry *)

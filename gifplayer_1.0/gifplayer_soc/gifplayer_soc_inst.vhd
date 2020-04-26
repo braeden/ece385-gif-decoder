@@ -12,14 +12,14 @@
 			sdram_wire_dqm   : out   std_logic_vector(3 downto 0);                     -- dqm
 			sdram_wire_ras_n : out   std_logic;                                        -- ras_n
 			sdram_wire_we_n  : out   std_logic;                                        -- we_n
-			sw_wire_export   : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			sram_wire_DQ     : inout std_logic_vector(15 downto 0) := (others => 'X'); -- DQ
 			sram_wire_ADDR   : out   std_logic_vector(19 downto 0);                    -- ADDR
 			sram_wire_LB_N   : out   std_logic;                                        -- LB_N
 			sram_wire_UB_N   : out   std_logic;                                        -- UB_N
 			sram_wire_CE_N   : out   std_logic;                                        -- CE_N
 			sram_wire_OE_N   : out   std_logic;                                        -- OE_N
-			sram_wire_WE_N   : out   std_logic                                         -- WE_N
+			sram_wire_WE_N   : out   std_logic;                                        -- WE_N
+			sw_wire_export   : in    std_logic_vector(7 downto 0)  := (others => 'X')  -- export
 		);
 	end component gifplayer_soc;
 
@@ -37,13 +37,13 @@
 			sdram_wire_dqm   => CONNECTED_TO_sdram_wire_dqm,   --           .dqm
 			sdram_wire_ras_n => CONNECTED_TO_sdram_wire_ras_n, --           .ras_n
 			sdram_wire_we_n  => CONNECTED_TO_sdram_wire_we_n,  --           .we_n
-			sw_wire_export   => CONNECTED_TO_sw_wire_export,   --    sw_wire.export
 			sram_wire_DQ     => CONNECTED_TO_sram_wire_DQ,     --  sram_wire.DQ
 			sram_wire_ADDR   => CONNECTED_TO_sram_wire_ADDR,   --           .ADDR
 			sram_wire_LB_N   => CONNECTED_TO_sram_wire_LB_N,   --           .LB_N
 			sram_wire_UB_N   => CONNECTED_TO_sram_wire_UB_N,   --           .UB_N
 			sram_wire_CE_N   => CONNECTED_TO_sram_wire_CE_N,   --           .CE_N
 			sram_wire_OE_N   => CONNECTED_TO_sram_wire_OE_N,   --           .OE_N
-			sram_wire_WE_N   => CONNECTED_TO_sram_wire_WE_N    --           .WE_N
+			sram_wire_WE_N   => CONNECTED_TO_sram_wire_WE_N,   --           .WE_N
+			sw_wire_export   => CONNECTED_TO_sw_wire_export    --    sw_wire.export
 		);
 

@@ -11,13 +11,13 @@
 		.sdram_wire_dqm   (<connected-to-sdram_wire_dqm>),   //           .dqm
 		.sdram_wire_ras_n (<connected-to-sdram_wire_ras_n>), //           .ras_n
 		.sdram_wire_we_n  (<connected-to-sdram_wire_we_n>),  //           .we_n
-		.sw_wire_export   (<connected-to-sw_wire_export>),   //    sw_wire.export
 		.sram_wire_DQ     (<connected-to-sram_wire_DQ>),     //  sram_wire.DQ
 		.sram_wire_ADDR   (<connected-to-sram_wire_ADDR>),   //           .ADDR
 		.sram_wire_LB_N   (<connected-to-sram_wire_LB_N>),   //           .LB_N
 		.sram_wire_UB_N   (<connected-to-sram_wire_UB_N>),   //           .UB_N
 		.sram_wire_CE_N   (<connected-to-sram_wire_CE_N>),   //           .CE_N
 		.sram_wire_OE_N   (<connected-to-sram_wire_OE_N>),   //           .OE_N
-		.sram_wire_WE_N   (<connected-to-sram_wire_WE_N>)    //           .WE_N
+		.sram_wire_WE_N   (<connected-to-sram_wire_WE_N>),   //           .WE_N
+		.sw_wire_export   (<connected-to-sw_wire_export>)    //    sw_wire.export
 	);
 

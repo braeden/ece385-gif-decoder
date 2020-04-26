@@ -48,12 +48,23 @@ module gifplayer_top (
 );
 
     logic Reset_h, Clk;
-    //logic [9:0] DrawX, DrawY;
+    logic [9:0] DrawX, DrawY;
+	logic [20:0] sram_addr_out;
+	logic [7:0] lookup_addr;
+	logic BEGIN;
     
     assign Clk = CLOCK_50;
     always_ff @ (posedge Clk) begin
         Reset_h <= ~(KEY[0]);        // The push buttons are active low
     end
+
+	always_comb begin
+		SRAM_CE_N = BEGIN;
+		SRAM_LB_N = sram_addr_out[20];
+		SRAM_ADDR = sram_addr_out[19:0];
+		SRAM_UB_N = ~SRAM_LB_N;
+		lookup_addr = SRAM_DQ[7:0]; //Grab lower bytes only?
+	end
 
 	// Instantiation of Qsys design
 	gifplayer_soc gifplayer_soc (
@@ -82,6 +93,70 @@ module gifplayer_top (
 
 	// VGA_CLK needs to be 25 MHz
 	vga_clk vga_clk_instance(.inclk0(Clk), .c0(VGA_CLK) );
+
+
+    // TODO: Fill in the connections for the rest of the modules 
+    VGA_controller vga_controller_instance(
+        .Clk(Clk), 
+        .Reset(Reset_h), 
+        .VGA_CLK(VGA_CLK),
+        .DrawY(DrawY), 
+        .DrawX(DrawX),
+        .VGA_HS(VGA_HS),
+        .VGA_VS(VGA_VS),
+        .VGA_BLANK_N(VGA_BLANK_N),
+    );
+
+	frame_state_machine frame_state_machine_instance(
+	// input -> clk, reset, some way to talk to SRAM (or a OCM that software can write to)
+	// 
+	// output -> BEGIN? Maybe SETUP->
+
+	//Maybe several states used to load data into OCM...
+	// 
+		.Clk(Clk),
+		.Reset(Reset_h),
+		.DrawStart(1'b1), //Replace this with software indication
+
+		.BEGIN(BEGIN)
+
+	);
+
+	//Some small async OCM -> space for [8:0] Framecount, [16:0] width, [height]
+	//example (clk, reset, width, framect, height)
+	//output width, framect, height
+
+
+	frame_manager frame_manager_instance (
+		//input = clk, reset, drawx, drawy, VGA_CLK, 
+		//internal, currentframe, totalframecount, width and height, displayCount 
+		//(how many times we've shown current frame)
+		//Output -> from SRAM get data at framecount*xsize*ysize + baseaddr 
+		// get addr to lookup
+
+
+
+	);
+
+	// frameCount instance (
+	// 	//Maybe should be a submodule, keep track of current frame. 
+	// );
+
+	lookup_reg lookup_reg(
+		//We should get software to write this directy (avalon MM bus)
+		//input = index, reset, clk, enable
+		//if (addr != 8'bX) -> return value at [8:0 (256 choices of index)][32:0 (24 bits of data)]
+		//output -> VGA_R, G, B, return black otherwise
+		//if (addr) return
+		.Clk(Clk),
+		.Reset(Reset_h),
+		.output_en(addr != 20'bX),//BEGIN | 1'b1);
+		.addr(lookup_addr),
+		.VGA_R(VGA_R),
+		.VGA_G(VGA_G),
+		.VGA_B(VGA_B)
+	);
+
 
 	// Hex display will display something.
 	hexdriver hexdrv0 (

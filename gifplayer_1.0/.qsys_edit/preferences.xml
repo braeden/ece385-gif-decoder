@@ -3,11 +3,11 @@
  <debug showDebugMenu="0" />
  <systemtable filter="All Interfaces">
   <columns>
-   <connections preferredWidth="175" />
+   <connections preferredWidth="207" />
    <irq preferredWidth="34" />
   </columns>
  </systemtable>
  <library
-   expandedCategories="Library/University Program/Memory,Library/University Program,Library,Project" />
+   expandedCategories="Project,Library,Library/Basic Functions/DMA,Library/Basic Functions/Clocks; PLLs and Resets,Library/Basic Functions,Library/Basic Functions/On Chip Memory" />
  <window width="1790" height="1030" x="130" y="0" />
 </preferences>
