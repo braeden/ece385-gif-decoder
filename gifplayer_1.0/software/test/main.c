@@ -7,7 +7,13 @@
 #include "structs.h"
 
 static char VALID_HEADER[3] = "GIF";
+static unsigned char *frameptr = 0x00419450;
+
+
 unsigned char *fileptr;
+unsigned int32_t *ocmptr;
+int ON_NIOS = 0;
+
 
 void checkPacked() {
 	assert(sizeof(HeaderBlock) == 6);
@@ -48,8 +54,6 @@ int main() {
 //		 printf("File not load !\n");
 //		 exit(0);
 //	 }
-////	 printf("File loaded?\n");
-////	 exit(0);
 //	 fseek(f, 0, SEEK_END);
 //	 long fsize = ftell(f);
 //	 fseek(f, 0, SEEK_SET);
@@ -62,6 +66,7 @@ int main() {
 
 	//Set pointer from SRAM
 	fileptr = 0x00400050;
+	ocmptr = 0x00001000;
 
 //	*fileptr = 0x68;
 //	fileptr++;
@@ -96,6 +101,8 @@ int main() {
 	//Read global color table and print it
 	fileptr = read(globalTable, 3, readlGlobalColorSize, fileptr);
 
+
+
 	for (int i = 0; i < readlGlobalColorSize; i++) {
 		printf("[#");
 		for (int j = 0; j < 3; j++) {
@@ -106,6 +113,8 @@ int main() {
 	printf("\n");
 
 	//////////////////////////////////////////////////
+
+	int8_t totalFrameCount = 0;
 	while (1) {
 		printf("herehere\n");
 		GCE gce;
@@ -192,7 +201,7 @@ int main() {
 		unsigned char *dataOut = malloc(imgDesc.imgHeight * imgDesc.imgWidth);
 //
 		// // Write developed image frame to some sort of storage
-		 uncompress(LZWMinCode, data, dataSize, dataOut);
+		uncompress(LZWMinCode, data, dataSize, dataOut);
 //		 for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
 //		 	if (i % imgDesc.imgWidth == 0) {
 //		 		printf("\n");
@@ -201,6 +210,7 @@ int main() {
 //		 	printf("%02x ", dataOut[i]);
 ////		 	printf("\033[0m");
 //		 }
+		memcpy(frameptr, dataOut, imgDesc.imgHeight*imgDesc.imgWidth);
 
 		// Here we have completed image data
 		// We should write: check if localColorFlag then use that to grab colors from data[i]
@@ -219,6 +229,27 @@ int main() {
 			printf("\nEOF found\n");
 			break;
 		}
+		totalFrameCount++;
+	}
+
+	if (ON_NIOS) {
+		for (int i = 0; i<258; i++) {
+			ocmptr[i] = 0;
+		}
+		for (int i = 0; i<readlGlobalColorSize; i++) {
+			for (int j = 0; j<3; j++) {
+				ocmptr[i] += globalTable[i].RGB[j]<< (24-j*8);
+			}
+		}
+
+
+		ocmptr[256] = 0;
+		ocmptr[256] += descriptor.canvasWidth;
+		ocmptr[256] += descriptor.canvasHeight;
+
+		ocmptr[257] = 0;
+		ocmptr[257] += totalFrameCount<<24; //last set of bytes
+		ocmptr[257] += 1;
 	}
 
 	free(globalTable);

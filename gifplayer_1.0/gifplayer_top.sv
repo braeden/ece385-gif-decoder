@@ -49,21 +49,50 @@ module gifplayer_top (
 
     logic Reset_h, Clk;
     logic [9:0] DrawX, DrawY;
-	logic [20:0] sram_addr_out;
-	logic [7:0] lookup_addr;
 	logic BEGIN;
-    
+	logic [8255:0] lookup_output;
+	logic [257:0][31:0] lookup_output_array;
+    logic [15:0] width;
+	logic [15:0] height;
+	logic [7:0] frame_count;
+	logic HARDWARE_EN;
+
+	// SRAM Interface for Nios II Software
+	wire  [15:0] SRAM_DQ_SW; 
+	logic [19:0] SRAM_ADDR_SW;   //           .ADDR
+	logic        SRAM_LB_N_SW,   //           .LB_N
+					SRAM_UB_N_SW,   //           .UB_N
+					SRAM_CE_N_SW,   //           .CE_N
+					SRAM_OE_N_SW,   //           .OE_N
+					SRAM_WE_N_SW;   //           .WE_N
+
+	// SRAM Interface for hardware
+	wire  [15:0] SRAM_DQ_HW;
+	logic [19:0] SRAM_ADDR_HW;   //           .ADDR
+	logic        SRAM_LB_N_HW,   //           .LB_N
+					SRAM_UB_N_HW,   //           .UB_N
+					SRAM_CE_N_HW,   //           .CE_N
+					SRAM_OE_N_HW,   //           .OE_N
+					SRAM_WE_N_HW;   //           .WE_N
+
+
+
+
     assign Clk = CLOCK_50;
     always_ff @ (posedge Clk) begin
         Reset_h <= ~(KEY[0]);        // The push buttons are active low
     end
 
 	always_comb begin
-		SRAM_CE_N = BEGIN;
-		SRAM_LB_N = sram_addr_out[20];
-		SRAM_ADDR = sram_addr_out[19:0];
-		SRAM_UB_N = ~SRAM_LB_N;
-		lookup_addr = SRAM_DQ[7:0]; //Grab lower bytes only?
+	//This might be 256+258
+		for (int i=0; i<258; i++)  begin
+			lookup_output_array[i] = lookup_output[32*i +: 32];
+		end
+
+		width = lookup_output_array[9'd256][31:16];
+		height = lookup_output_array[9'd256][15:0];
+		frame_count = lookup_output_array[9'd257][31:24];
+		HARDWARE_EN = lookup_output_array[9'd257][0];
 	end
 
 	// Instantiation of Qsys design
@@ -81,13 +110,15 @@ module gifplayer_top (
 		.sdram_wire_we_n(DRAM_WE_N),					// sdram.we_n
 		.sdram_clk_clk(DRAM_CLK),						// Clock out to SDRAM
 		.sw_wire_export(SW),
-		.sram_wire_DQ(SRAM_DQ),     					//  sram_wire.DQ
-		.sram_wire_ADDR(SRAM_ADDR),   					//           .ADDR
-		.sram_wire_LB_N(SRAM_LB_N),   					//           .LB_N
-		.sram_wire_UB_N(SRAM_UB_N),   					//           .UB_N
-		.sram_wire_CE_N(SRAM_CE_N),   					//           .CE_N
-		.sram_wire_OE_N(SRAM_OE_N),   					//           .OE_N
-		.sram_wire_WE_N(SRAM_WE_N)   					//           .WE_N
+		.sram_wire_DQ(SRAM_DQ_SW),     					//  sram_wire.DQ
+		.sram_wire_ADDR(SRAM_ADDR_SW),   					//           .ADDR
+		.sram_wire_LB_N(SRAM_LB_N_SW),   					//           .LB_N
+		.sram_wire_UB_N(SRAM_UB_N_SW),   					//           .UB_N
+		.sram_wire_CE_N(SRAM_CE_N_SW),   					//           .CE_N
+		.sram_wire_OE_N(SRAM_OE_N_SW),   					//           .OE_N
+		.sram_wire_WE_N(SRAM_WE_N_SW),   					//           .WE_N
+
+		.lookup_export_export_data(lookup_output)
 	);
 
 
@@ -107,20 +138,26 @@ module gifplayer_top (
         .VGA_BLANK_N(VGA_BLANK_N),
     );
 
-	frame_state_machine frame_state_machine_instance(
-	// input -> clk, reset, some way to talk to SRAM (or a OCM that software can write to)
-	// 
-	// output -> BEGIN? Maybe SETUP->
+	// frame_state_machine frame_state_machine_instance(
+	// // input -> clk, reset, some way to talk to SRAM (or a OCM that software can write to)
+	// // 
+	// // output -> BEGIN? Maybe SETUP->
 
-	//Maybe several states used to load data into OCM...
-	// 
-		.Clk(Clk),
-		.Reset(Reset_h),
-		.DrawStart(1'b1), //Replace this with software indication
+	// //Maybe several states used to load data into OCM...
+	// // 
+	// 	.Clk(Clk),
+	// 	.Reset(Reset_h),
+	// 	.DrawStart(1'b1), //Replace this with software indication
 
-		.BEGIN(BEGIN)
+	// 	.BEGIN(BEGIN)
 
-	);
+	// );
+
+	// Make a avalon interface like lab 9, in the always comb section, output a set of wire continously, that hold width height, ect
+	//Avalon should hold lookup table+ stuff. 
+	//It should have a variable output from a address.
+	// Tristate the SRAM from NIOS, use a bit in OCM to tell if we're done
+
 
 	//Some small async OCM -> space for [8:0] Framecount, [16:0] width, [height]
 	//example (clk, reset, width, framect, height)
@@ -128,34 +165,79 @@ module gifplayer_top (
 
 
 	frame_manager frame_manager_instance (
-		//input = clk, reset, drawx, drawy, VGA_CLK, 
-		//internal, currentframe, totalframecount, width and height, displayCount 
-		//(how many times we've shown current frame)
-		//Output -> from SRAM get data at framecount*xsize*ysize + baseaddr 
-		// get addr to lookup
-
-
-
-	);
-
-	// frameCount instance (
-	// 	//Maybe should be a submodule, keep track of current frame. 
-	// );
-
-	lookup_reg lookup_reg(
-		//We should get software to write this directy (avalon MM bus)
-		//input = index, reset, clk, enable
-		//if (addr != 8'bX) -> return value at [8:0 (256 choices of index)][32:0 (24 bits of data)]
-		//output -> VGA_R, G, B, return black otherwise
-		//if (addr) return
 		.Clk(Clk),
 		.Reset(Reset_h),
-		.output_en(addr != 20'bX),//BEGIN | 1'b1);
-		.addr(lookup_addr),
+		.VGA_CLK(VGA_CLK),
+		.lookup_table(lookup_output_array),
+		.width(width),
+		.height(height),
+		.totalFrameCount(frame_count),
+		.HARDWARE_EN(HARDWARE_EN),
+
+
+		.sram_wire_DQ(SRAM_DQ_HW),     					//  sram_wire.DQ
+		.sram_wire_ADDR(SRAM_ADDR_HW),   					//           .ADDR
+		.sram_wire_LB_N(SRAM_LB_N_HW),   					//           .LB_N
+		.sram_wire_UB_N(SRAM_UB_N_HW),   					//           .UB_N
+		.sram_wire_CE_N(SRAM_CE_N_HW),   					//           .CE_N
+		.sram_wire_OE_N(SRAM_OE_N_HW),   					//           .OE_N
+		.sram_wire_WE_N(SRAM_WE_N_HW),   					//           .WE_N
+
 		.VGA_R(VGA_R),
 		.VGA_G(VGA_G),
 		.VGA_B(VGA_B)
 	);
+
+
+	sram_mux sram_mux_instance (
+		.select(HARDWARE_EN), // 0 = software, 1 = hardware
+		
+		.sram_wire_DQ_sw(SRAM_DQ_SW),     					//  sram_wire.DQ
+		.sram_wire_ADDR_sw(SRAM_ADDR_SW),   					//           .ADDR
+		.sram_wire_LB_N_sw(SRAM_LB_N_SW),   					//           .LB_N
+		.sram_wire_UB_N_sw(SRAM_UB_N_SW),   					//           .UB_N
+		.sram_wire_CE_N_sw(SRAM_CE_N_SW),   					//           .CE_N
+		.sram_wire_OE_N_sw(SRAM_OE_N_SW),   					//           .OE_N
+		.sram_wire_WE_N_sw(SRAM_WE_N_SW), 
+		
+
+		.sram_wire_DQ_hw(SRAM_DQ_HW),     					//  sram_wire.DQ
+		.sram_wire_ADDR_hw(SRAM_ADDR_HW),   					//           .ADDR
+		.sram_wire_LB_N_hw(SRAM_LB_N_HW),   					//           .LB_N
+		.sram_wire_UB_N_hw(SRAM_UB_N_HW),   					//           .UB_N
+		.sram_wire_CE_N_hw(SRAM_CE_N_HW),   					//           .CE_N
+		.sram_wire_OE_N_hw(SRAM_OE_N_HW),   					//           .OE_N
+		.sram_wire_WE_N_hw(SRAM_WE_N_HW), 
+
+		
+		
+		.sram_wire_DQ_out(SRAM_DQ),     					//  sram_wire.DQ
+		.sram_wire_ADDR_out(SRAM_ADDR),   					//           .ADDR
+		.sram_wire_LB_N_out(SRAM_LB_N),   					//           .LB_N
+		.sram_wire_UB_N_out(SRAM_UB_N),   					//           .UB_N
+		.sram_wire_CE_N_out(SRAM_CE_N),   					//           .CE_N
+		.sram_wire_OE_N_out(SRAM_OE_N),   					//           .OE_N
+		.sram_wire_WE_N_out(SRAM_WE_N)
+	);
+
+	// frameCount instance (
+	// 	//Maybe should be a submodule, keep track of current frame. 
+	// // );
+
+	// lookup_reg lookup_reg(
+	// 	//We should get software to write this directy (avalon MM bus)
+	// 	//input = index, reset, clk, enable
+	// 	//if (addr != 8'bX) -> return value at [8:0 (256 choices of index)][32:0 (24 bits of data)]
+	// 	//output -> VGA_R, G, B, return black otherwise
+	// 	//if (addr) return
+	// 	.Clk(Clk),
+	// 	.Reset(Reset_h),
+	// 	.output_en(addr != 20'bX),//BEGIN | 1'b1);
+	// 	.addr(lookup_addr),
+	// 	.VGA_R(VGA_R),
+	// 	.VGA_G(VGA_G),
+	// 	.VGA_B(VGA_B)
+	// );
 
 
 	// Hex display will display something.

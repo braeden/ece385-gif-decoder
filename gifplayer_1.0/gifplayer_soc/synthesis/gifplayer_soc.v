@@ -4,26 +4,27 @@
 
 `timescale 1 ps / 1 ps
 module gifplayer_soc (
-		input  wire        clk_clk,          //        clk.clk
-		input  wire        reset_reset_n,    //      reset.reset_n
-		output wire        sdram_clk_clk,    //  sdram_clk.clk
-		output wire [12:0] sdram_wire_addr,  // sdram_wire.addr
-		output wire [1:0]  sdram_wire_ba,    //           .ba
-		output wire        sdram_wire_cas_n, //           .cas_n
-		output wire        sdram_wire_cke,   //           .cke
-		output wire        sdram_wire_cs_n,  //           .cs_n
-		inout  wire [31:0] sdram_wire_dq,    //           .dq
-		output wire [3:0]  sdram_wire_dqm,   //           .dqm
-		output wire        sdram_wire_ras_n, //           .ras_n
-		output wire        sdram_wire_we_n,  //           .we_n
-		inout  wire [15:0] sram_wire_DQ,     //  sram_wire.DQ
-		output wire [19:0] sram_wire_ADDR,   //           .ADDR
-		output wire        sram_wire_LB_N,   //           .LB_N
-		output wire        sram_wire_UB_N,   //           .UB_N
-		output wire        sram_wire_CE_N,   //           .CE_N
-		output wire        sram_wire_OE_N,   //           .OE_N
-		output wire        sram_wire_WE_N,   //           .WE_N
-		input  wire [7:0]  sw_wire_export    //    sw_wire.export
+		input  wire          clk_clk,                   //           clk.clk
+		output wire [8255:0] lookup_export_export_data, // lookup_export.export_data
+		input  wire          reset_reset_n,             //         reset.reset_n
+		output wire          sdram_clk_clk,             //     sdram_clk.clk
+		output wire [12:0]   sdram_wire_addr,           //    sdram_wire.addr
+		output wire [1:0]    sdram_wire_ba,             //              .ba
+		output wire          sdram_wire_cas_n,          //              .cas_n
+		output wire          sdram_wire_cke,            //              .cke
+		output wire          sdram_wire_cs_n,           //              .cs_n
+		inout  wire [31:0]   sdram_wire_dq,             //              .dq
+		output wire [3:0]    sdram_wire_dqm,            //              .dqm
+		output wire          sdram_wire_ras_n,          //              .ras_n
+		output wire          sdram_wire_we_n,           //              .we_n
+		inout  wire [15:0]   sram_wire_DQ,              //     sram_wire.DQ
+		output wire [19:0]   sram_wire_ADDR,            //              .ADDR
+		output wire          sram_wire_LB_N,            //              .LB_N
+		output wire          sram_wire_UB_N,            //              .UB_N
+		output wire          sram_wire_CE_N,            //              .CE_N
+		output wire          sram_wire_OE_N,            //              .OE_N
+		output wire          sram_wire_WE_N,            //              .WE_N
+		input  wire [7:0]    sw_wire_export             //       sw_wire.export
 	);
 
 	wire         sdram_pll_c0_clk;                                            // sdram_pll:c0 -> [mm_interconnect_0:sdram_pll_c0_clk, rst_controller_003:clk, sdram:clk]
@@ -63,6 +64,13 @@ module gifplayer_soc (
 	wire   [3:0] mm_interconnect_0_nios2_gen2_0_debug_mem_slave_byteenable;   // mm_interconnect_0:nios2_gen2_0_debug_mem_slave_byteenable -> nios2_gen2_0:debug_mem_slave_byteenable
 	wire         mm_interconnect_0_nios2_gen2_0_debug_mem_slave_write;        // mm_interconnect_0:nios2_gen2_0_debug_mem_slave_write -> nios2_gen2_0:debug_mem_slave_write
 	wire  [31:0] mm_interconnect_0_nios2_gen2_0_debug_mem_slave_writedata;    // mm_interconnect_0:nios2_gen2_0_debug_mem_slave_writedata -> nios2_gen2_0:debug_mem_slave_writedata
+	wire         mm_interconnect_0_lookup_0_lookup_slave_chipselect;          // mm_interconnect_0:lookup_0_lookup_slave_chipselect -> lookup_0:AVL_CS
+	wire  [31:0] mm_interconnect_0_lookup_0_lookup_slave_readdata;            // lookup_0:AVL_READDATA -> mm_interconnect_0:lookup_0_lookup_slave_readdata
+	wire   [8:0] mm_interconnect_0_lookup_0_lookup_slave_address;             // mm_interconnect_0:lookup_0_lookup_slave_address -> lookup_0:AVL_ADDR
+	wire         mm_interconnect_0_lookup_0_lookup_slave_read;                // mm_interconnect_0:lookup_0_lookup_slave_read -> lookup_0:AVL_READ
+	wire   [3:0] mm_interconnect_0_lookup_0_lookup_slave_byteenable;          // mm_interconnect_0:lookup_0_lookup_slave_byteenable -> lookup_0:AVL_BYTE_EN
+	wire         mm_interconnect_0_lookup_0_lookup_slave_write;               // mm_interconnect_0:lookup_0_lookup_slave_write -> lookup_0:AVL_WRITE
+	wire  [31:0] mm_interconnect_0_lookup_0_lookup_slave_writedata;           // mm_interconnect_0:lookup_0_lookup_slave_writedata -> lookup_0:AVL_WRITEDATA
 	wire  [31:0] mm_interconnect_0_sdram_pll_pll_slave_readdata;              // sdram_pll:readdata -> mm_interconnect_0:sdram_pll_pll_slave_readdata
 	wire   [1:0] mm_interconnect_0_sdram_pll_pll_slave_address;               // mm_interconnect_0:sdram_pll_pll_slave_address -> sdram_pll:address
 	wire         mm_interconnect_0_sdram_pll_pll_slave_read;                  // mm_interconnect_0:sdram_pll_pll_slave_read -> sdram_pll:read
@@ -77,47 +85,19 @@ module gifplayer_soc (
 	wire         mm_interconnect_0_sdram_s1_readdatavalid;                    // sdram:za_valid -> mm_interconnect_0:sdram_s1_readdatavalid
 	wire         mm_interconnect_0_sdram_s1_write;                            // mm_interconnect_0:sdram_s1_write -> sdram:az_wr_n
 	wire  [31:0] mm_interconnect_0_sdram_s1_writedata;                        // mm_interconnect_0:sdram_s1_writedata -> sdram:az_data
-	wire         mm_interconnect_0_lookup_table_s1_chipselect;                // mm_interconnect_0:lookup_table_s1_chipselect -> lookup_table:chipselect
-	wire  [31:0] mm_interconnect_0_lookup_table_s1_readdata;                  // lookup_table:readdata -> mm_interconnect_0:lookup_table_s1_readdata
-	wire   [7:0] mm_interconnect_0_lookup_table_s1_address;                   // mm_interconnect_0:lookup_table_s1_address -> lookup_table:address
-	wire   [3:0] mm_interconnect_0_lookup_table_s1_byteenable;                // mm_interconnect_0:lookup_table_s1_byteenable -> lookup_table:byteenable
-	wire         mm_interconnect_0_lookup_table_s1_write;                     // mm_interconnect_0:lookup_table_s1_write -> lookup_table:write
-	wire  [31:0] mm_interconnect_0_lookup_table_s1_writedata;                 // mm_interconnect_0:lookup_table_s1_writedata -> lookup_table:writedata
-	wire         mm_interconnect_0_lookup_table_s1_clken;                     // mm_interconnect_0:lookup_table_s1_clken -> lookup_table:clken
 	wire  [31:0] mm_interconnect_0_switches_s1_readdata;                      // switches:readdata -> mm_interconnect_0:switches_s1_readdata
 	wire   [1:0] mm_interconnect_0_switches_s1_address;                       // mm_interconnect_0:switches_s1_address -> switches:address
-	wire         mm_interconnect_0_image_details_s1_chipselect;               // mm_interconnect_0:image_details_s1_chipselect -> image_details:chipselect
-	wire  [15:0] mm_interconnect_0_image_details_s1_readdata;                 // image_details:readdata -> mm_interconnect_0:image_details_s1_readdata
-	wire   [1:0] mm_interconnect_0_image_details_s1_address;                  // mm_interconnect_0:image_details_s1_address -> image_details:address
-	wire   [1:0] mm_interconnect_0_image_details_s1_byteenable;               // mm_interconnect_0:image_details_s1_byteenable -> image_details:byteenable
-	wire         mm_interconnect_0_image_details_s1_write;                    // mm_interconnect_0:image_details_s1_write -> image_details:write
-	wire  [15:0] mm_interconnect_0_image_details_s1_writedata;                // mm_interconnect_0:image_details_s1_writedata -> image_details:writedata
-	wire         mm_interconnect_0_image_details_s1_clken;                    // mm_interconnect_0:image_details_s1_clken -> image_details:clken
 	wire         irq_mapper_receiver0_irq;                                    // jtag_uart_0:av_irq -> irq_mapper:receiver0_irq
 	wire  [31:0] nios2_gen2_0_irq_irq;                                        // irq_mapper:sender_irq -> nios2_gen2_0:irq
-	wire         nios2_gen2_0_debug_reset_request_reset;                      // nios2_gen2_0:debug_reset_request -> [rst_controller:reset_in1, rst_controller_001:reset_in1, rst_controller_003:reset_in1]
-	wire         rst_controller_001_reset_out_reset;                          // rst_controller_001:reset_out -> [image_details:reset, irq_mapper:reset, lookup_table:reset, mm_interconnect_0:nios2_gen2_0_reset_reset_bridge_in_reset_reset, mm_interconnect_0:sram_0_reset_reset_bridge_in_reset_reset, nios2_gen2_0:reset_n, rst_translator:in_reset, sdram_pll:reset, sram_0:reset, switches:reset_n, sysid_qsys_0:reset_n]
-	wire         rst_controller_001_reset_out_reset_req;                      // rst_controller_001:reset_req -> [image_details:reset_req, lookup_table:reset_req, nios2_gen2_0:reset_req, rst_translator:reset_req_in]
-	wire         rst_controller_002_reset_out_reset;                          // rst_controller_002:reset_out -> [jtag_uart_0:rst_n, mm_interconnect_0:jtag_uart_0_reset_reset_bridge_in_reset_reset]
+	wire         nios2_gen2_0_debug_reset_request_reset;                      // nios2_gen2_0:debug_reset_request -> [rst_controller:reset_in1, rst_controller_002:reset_in1, rst_controller_003:reset_in1]
+	wire         rst_controller_001_reset_out_reset;                          // rst_controller_001:reset_out -> [jtag_uart_0:rst_n, lookup_0:RESET, mm_interconnect_0:jtag_uart_0_reset_reset_bridge_in_reset_reset]
+	wire         rst_controller_002_reset_out_reset;                          // rst_controller_002:reset_out -> [irq_mapper:reset, mm_interconnect_0:nios2_gen2_0_reset_reset_bridge_in_reset_reset, mm_interconnect_0:sram_0_reset_reset_bridge_in_reset_reset, nios2_gen2_0:reset_n, rst_translator:in_reset, sdram_pll:reset, sram_0:reset, switches:reset_n, sysid_qsys_0:reset_n]
+	wire         rst_controller_002_reset_out_reset_req;                      // rst_controller_002:reset_req -> [nios2_gen2_0:reset_req, rst_translator:reset_req_in]
 	wire         rst_controller_003_reset_out_reset;                          // rst_controller_003:reset_out -> [mm_interconnect_0:sdram_reset_reset_bridge_in_reset_reset, sdram:reset_n]
-
-	gifplayer_soc_image_details image_details (
-		.clk        (clk_clk),                                       //   clk1.clk
-		.address    (mm_interconnect_0_image_details_s1_address),    //     s1.address
-		.clken      (mm_interconnect_0_image_details_s1_clken),      //       .clken
-		.chipselect (mm_interconnect_0_image_details_s1_chipselect), //       .chipselect
-		.write      (mm_interconnect_0_image_details_s1_write),      //       .write
-		.readdata   (mm_interconnect_0_image_details_s1_readdata),   //       .readdata
-		.writedata  (mm_interconnect_0_image_details_s1_writedata),  //       .writedata
-		.byteenable (mm_interconnect_0_image_details_s1_byteenable), //       .byteenable
-		.reset      (rst_controller_001_reset_out_reset),            // reset1.reset
-		.reset_req  (rst_controller_001_reset_out_reset_req),        //       .reset_req
-		.freeze     (1'b0)                                           // (terminated)
-	);
 
 	gifplayer_soc_jtag_uart_0 jtag_uart_0 (
 		.clk            (clk_clk),                                                     //               clk.clk
-		.rst_n          (~rst_controller_002_reset_out_reset),                         //             reset.reset_n
+		.rst_n          (~rst_controller_001_reset_out_reset),                         //             reset.reset_n
 		.av_chipselect  (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_chipselect),  // avalon_jtag_slave.chipselect
 		.av_address     (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_address),     //                  .address
 		.av_read_n      (~mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_read),       //                  .read_n
@@ -128,24 +108,23 @@ module gifplayer_soc (
 		.av_irq         (irq_mapper_receiver0_irq)                                     //               irq.irq
 	);
 
-	gifplayer_soc_lookup_table lookup_table (
-		.clk        (clk_clk),                                      //   clk1.clk
-		.address    (mm_interconnect_0_lookup_table_s1_address),    //     s1.address
-		.clken      (mm_interconnect_0_lookup_table_s1_clken),      //       .clken
-		.chipselect (mm_interconnect_0_lookup_table_s1_chipselect), //       .chipselect
-		.write      (mm_interconnect_0_lookup_table_s1_write),      //       .write
-		.readdata   (mm_interconnect_0_lookup_table_s1_readdata),   //       .readdata
-		.writedata  (mm_interconnect_0_lookup_table_s1_writedata),  //       .writedata
-		.byteenable (mm_interconnect_0_lookup_table_s1_byteenable), //       .byteenable
-		.reset      (rst_controller_001_reset_out_reset),           // reset1.reset
-		.reset_req  (rst_controller_001_reset_out_reset_req),       //       .reset_req
-		.freeze     (1'b0)                                          // (terminated)
+	lookup_reg lookup_0 (
+		.CLK           (clk_clk),                                            //          CLK.clk
+		.RESET         (rst_controller_001_reset_out_reset),                 //        RESET.reset
+		.AVL_ADDR      (mm_interconnect_0_lookup_0_lookup_slave_address),    // lookup_slave.address
+		.AVL_BYTE_EN   (mm_interconnect_0_lookup_0_lookup_slave_byteenable), //             .byteenable
+		.AVL_CS        (mm_interconnect_0_lookup_0_lookup_slave_chipselect), //             .chipselect
+		.AVL_READDATA  (mm_interconnect_0_lookup_0_lookup_slave_readdata),   //             .readdata
+		.AVL_WRITE     (mm_interconnect_0_lookup_0_lookup_slave_write),      //             .write
+		.AVL_WRITEDATA (mm_interconnect_0_lookup_0_lookup_slave_writedata),  //             .writedata
+		.AVL_READ      (mm_interconnect_0_lookup_0_lookup_slave_read),       //             .read
+		.EXPORT_DATA   (lookup_export_export_data)                           //  Export_Data.export_data
 	);
 
 	gifplayer_soc_nios2_gen2_0 nios2_gen2_0 (
 		.clk                                 (clk_clk),                                                    //                       clk.clk
-		.reset_n                             (~rst_controller_001_reset_out_reset),                        //                     reset.reset_n
-		.reset_req                           (rst_controller_001_reset_out_reset_req),                     //                          .reset_req
+		.reset_n                             (~rst_controller_002_reset_out_reset),                        //                     reset.reset_n
+		.reset_req                           (rst_controller_002_reset_out_reset_req),                     //                          .reset_req
 		.d_address                           (nios2_gen2_0_data_master_address),                           //               data_master.address
 		.d_byteenable                        (nios2_gen2_0_data_master_byteenable),                        //                          .byteenable
 		.d_read                              (nios2_gen2_0_data_master_read),                              //                          .read
@@ -196,7 +175,7 @@ module gifplayer_soc (
 
 	gifplayer_soc_sdram_pll sdram_pll (
 		.clk                (clk_clk),                                         //       inclk_interface.clk
-		.reset              (rst_controller_001_reset_out_reset),              // inclk_interface_reset.reset
+		.reset              (rst_controller_002_reset_out_reset),              // inclk_interface_reset.reset
 		.read               (mm_interconnect_0_sdram_pll_pll_slave_read),      //             pll_slave.read
 		.write              (mm_interconnect_0_sdram_pll_pll_slave_write),     //                      .write
 		.address            (mm_interconnect_0_sdram_pll_pll_slave_address),   //                      .address
@@ -220,7 +199,7 @@ module gifplayer_soc (
 
 	gifplayer_soc_sram_0 sram_0 (
 		.clk           (clk_clk),                                                  //                clk.clk
-		.reset         (rst_controller_001_reset_out_reset),                       //              reset.reset
+		.reset         (rst_controller_002_reset_out_reset),                       //              reset.reset
 		.SRAM_DQ       (sram_wire_DQ),                                             // external_interface.export
 		.SRAM_ADDR     (sram_wire_ADDR),                                           //                   .export
 		.SRAM_LB_N     (sram_wire_LB_N),                                           //                   .export
@@ -239,7 +218,7 @@ module gifplayer_soc (
 
 	gifplayer_soc_switches switches (
 		.clk      (clk_clk),                                //                 clk.clk
-		.reset_n  (~rst_controller_001_reset_out_reset),    //               reset.reset_n
+		.reset_n  (~rst_controller_002_reset_out_reset),    //               reset.reset_n
 		.address  (mm_interconnect_0_switches_s1_address),  //                  s1.address
 		.readdata (mm_interconnect_0_switches_s1_readdata), //                    .readdata
 		.in_port  (sw_wire_export)                          // external_connection.export
@@ -247,7 +226,7 @@ module gifplayer_soc (
 
 	gifplayer_soc_sysid_qsys_0 sysid_qsys_0 (
 		.clock    (clk_clk),                                               //           clk.clk
-		.reset_n  (~rst_controller_001_reset_out_reset),                   //         reset.reset_n
+		.reset_n  (~rst_controller_002_reset_out_reset),                   //         reset.reset_n
 		.readdata (mm_interconnect_0_sysid_qsys_0_control_slave_readdata), // control_slave.readdata
 		.address  (mm_interconnect_0_sysid_qsys_0_control_slave_address)   //              .address
 	);
@@ -256,10 +235,10 @@ module gifplayer_soc (
 		.clk_0_clk_clk                                  (clk_clk),                                                     //                                clk_0_clk.clk
 		.fast_clk_clk_clk                               (clk_clk),                                                     //                             fast_clk_clk.clk
 		.sdram_pll_c0_clk                               (sdram_pll_c0_clk),                                            //                             sdram_pll_c0.clk
-		.jtag_uart_0_reset_reset_bridge_in_reset_reset  (rst_controller_002_reset_out_reset),                          //  jtag_uart_0_reset_reset_bridge_in_reset.reset
-		.nios2_gen2_0_reset_reset_bridge_in_reset_reset (rst_controller_001_reset_out_reset),                          // nios2_gen2_0_reset_reset_bridge_in_reset.reset
+		.jtag_uart_0_reset_reset_bridge_in_reset_reset  (rst_controller_001_reset_out_reset),                          //  jtag_uart_0_reset_reset_bridge_in_reset.reset
+		.nios2_gen2_0_reset_reset_bridge_in_reset_reset (rst_controller_002_reset_out_reset),                          // nios2_gen2_0_reset_reset_bridge_in_reset.reset
 		.sdram_reset_reset_bridge_in_reset_reset        (rst_controller_003_reset_out_reset),                          //        sdram_reset_reset_bridge_in_reset.reset
-		.sram_0_reset_reset_bridge_in_reset_reset       (rst_controller_001_reset_out_reset),                          //       sram_0_reset_reset_bridge_in_reset.reset
+		.sram_0_reset_reset_bridge_in_reset_reset       (rst_controller_002_reset_out_reset),                          //       sram_0_reset_reset_bridge_in_reset.reset
 		.nios2_gen2_0_data_master_address               (nios2_gen2_0_data_master_address),                            //                 nios2_gen2_0_data_master.address
 		.nios2_gen2_0_data_master_waitrequest           (nios2_gen2_0_data_master_waitrequest),                        //                                         .waitrequest
 		.nios2_gen2_0_data_master_byteenable            (nios2_gen2_0_data_master_byteenable),                         //                                         .byteenable
@@ -272,13 +251,6 @@ module gifplayer_soc (
 		.nios2_gen2_0_instruction_master_waitrequest    (nios2_gen2_0_instruction_master_waitrequest),                 //                                         .waitrequest
 		.nios2_gen2_0_instruction_master_read           (nios2_gen2_0_instruction_master_read),                        //                                         .read
 		.nios2_gen2_0_instruction_master_readdata       (nios2_gen2_0_instruction_master_readdata),                    //                                         .readdata
-		.image_details_s1_address                       (mm_interconnect_0_image_details_s1_address),                  //                         image_details_s1.address
-		.image_details_s1_write                         (mm_interconnect_0_image_details_s1_write),                    //                                         .write
-		.image_details_s1_readdata                      (mm_interconnect_0_image_details_s1_readdata),                 //                                         .readdata
-		.image_details_s1_writedata                     (mm_interconnect_0_image_details_s1_writedata),                //                                         .writedata
-		.image_details_s1_byteenable                    (mm_interconnect_0_image_details_s1_byteenable),               //                                         .byteenable
-		.image_details_s1_chipselect                    (mm_interconnect_0_image_details_s1_chipselect),               //                                         .chipselect
-		.image_details_s1_clken                         (mm_interconnect_0_image_details_s1_clken),                    //                                         .clken
 		.jtag_uart_0_avalon_jtag_slave_address          (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_address),     //            jtag_uart_0_avalon_jtag_slave.address
 		.jtag_uart_0_avalon_jtag_slave_write            (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_write),       //                                         .write
 		.jtag_uart_0_avalon_jtag_slave_read             (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_read),        //                                         .read
@@ -286,13 +258,13 @@ module gifplayer_soc (
 		.jtag_uart_0_avalon_jtag_slave_writedata        (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_writedata),   //                                         .writedata
 		.jtag_uart_0_avalon_jtag_slave_waitrequest      (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_waitrequest), //                                         .waitrequest
 		.jtag_uart_0_avalon_jtag_slave_chipselect       (mm_interconnect_0_jtag_uart_0_avalon_jtag_slave_chipselect),  //                                         .chipselect
-		.lookup_table_s1_address                        (mm_interconnect_0_lookup_table_s1_address),                   //                          lookup_table_s1.address
-		.lookup_table_s1_write                          (mm_interconnect_0_lookup_table_s1_write),                     //                                         .write
-		.lookup_table_s1_readdata                       (mm_interconnect_0_lookup_table_s1_readdata),                  //                                         .readdata
-		.lookup_table_s1_writedata                      (mm_interconnect_0_lookup_table_s1_writedata),                 //                                         .writedata
-		.lookup_table_s1_byteenable                     (mm_interconnect_0_lookup_table_s1_byteenable),                //                                         .byteenable
-		.lookup_table_s1_chipselect                     (mm_interconnect_0_lookup_table_s1_chipselect),                //                                         .chipselect
-		.lookup_table_s1_clken                          (mm_interconnect_0_lookup_table_s1_clken),                     //                                         .clken
+		.lookup_0_lookup_slave_address                  (mm_interconnect_0_lookup_0_lookup_slave_address),             //                    lookup_0_lookup_slave.address
+		.lookup_0_lookup_slave_write                    (mm_interconnect_0_lookup_0_lookup_slave_write),               //                                         .write
+		.lookup_0_lookup_slave_read                     (mm_interconnect_0_lookup_0_lookup_slave_read),                //                                         .read
+		.lookup_0_lookup_slave_readdata                 (mm_interconnect_0_lookup_0_lookup_slave_readdata),            //                                         .readdata
+		.lookup_0_lookup_slave_writedata                (mm_interconnect_0_lookup_0_lookup_slave_writedata),           //                                         .writedata
+		.lookup_0_lookup_slave_byteenable               (mm_interconnect_0_lookup_0_lookup_slave_byteenable),          //                                         .byteenable
+		.lookup_0_lookup_slave_chipselect               (mm_interconnect_0_lookup_0_lookup_slave_chipselect),          //                                         .chipselect
 		.nios2_gen2_0_debug_mem_slave_address           (mm_interconnect_0_nios2_gen2_0_debug_mem_slave_address),      //             nios2_gen2_0_debug_mem_slave.address
 		.nios2_gen2_0_debug_mem_slave_write             (mm_interconnect_0_nios2_gen2_0_debug_mem_slave_write),        //                                         .write
 		.nios2_gen2_0_debug_mem_slave_read              (mm_interconnect_0_nios2_gen2_0_debug_mem_slave_read),         //                                         .read
@@ -330,7 +302,7 @@ module gifplayer_soc (
 
 	gifplayer_soc_irq_mapper irq_mapper (
 		.clk           (clk_clk),                            //       clk.clk
-		.reset         (rst_controller_001_reset_out_reset), // clk_reset.reset
+		.reset         (rst_controller_002_reset_out_reset), // clk_reset.reset
 		.receiver0_irq (irq_mapper_receiver0_irq),           // receiver0.irq
 		.sender_irq    (nios2_gen2_0_irq_irq)                //    sender.irq
 	);
@@ -399,69 +371,6 @@ module gifplayer_soc (
 	);
 
 	altera_reset_controller #(
-		.NUM_RESET_INPUTS          (2),
-		.OUTPUT_RESET_SYNC_EDGES   ("deassert"),
-		.SYNC_DEPTH                (2),
-		.RESET_REQUEST_PRESENT     (1),
-		.RESET_REQ_WAIT_TIME       (1),
-		.MIN_RST_ASSERTION_TIME    (3),
-		.RESET_REQ_EARLY_DSRT_TIME (1),
-		.USE_RESET_REQUEST_IN0     (0),
-		.USE_RESET_REQUEST_IN1     (0),
-		.USE_RESET_REQUEST_IN2     (0),
-		.USE_RESET_REQUEST_IN3     (0),
-		.USE_RESET_REQUEST_IN4     (0),
-		.USE_RESET_REQUEST_IN5     (0),
-		.USE_RESET_REQUEST_IN6     (0),
-		.USE_RESET_REQUEST_IN7     (0),
-		.USE_RESET_REQUEST_IN8     (0),
-		.USE_RESET_REQUEST_IN9     (0),
-		.USE_RESET_REQUEST_IN10    (0),
-		.USE_RESET_REQUEST_IN11    (0),
-		.USE_RESET_REQUEST_IN12    (0),
-		.USE_RESET_REQUEST_IN13    (0),
-		.USE_RESET_REQUEST_IN14    (0),
-		.USE_RESET_REQUEST_IN15    (0),
-		.ADAPT_RESET_REQUEST       (0)
-	) rst_controller_001 (
-		.reset_in0      (~reset_reset_n),                         // reset_in0.reset
-		.reset_in1      (nios2_gen2_0_debug_reset_request_reset), // reset_in1.reset
-		.clk            (clk_clk),                                //       clk.clk
-		.reset_out      (rst_controller_001_reset_out_reset),     // reset_out.reset
-		.reset_req      (rst_controller_001_reset_out_reset_req), //          .reset_req
-		.reset_req_in0  (1'b0),                                   // (terminated)
-		.reset_req_in1  (1'b0),                                   // (terminated)
-		.reset_in2      (1'b0),                                   // (terminated)
-		.reset_req_in2  (1'b0),                                   // (terminated)
-		.reset_in3      (1'b0),                                   // (terminated)
-		.reset_req_in3  (1'b0),                                   // (terminated)
-		.reset_in4      (1'b0),                                   // (terminated)
-		.reset_req_in4  (1'b0),                                   // (terminated)
-		.reset_in5      (1'b0),                                   // (terminated)
-		.reset_req_in5  (1'b0),                                   // (terminated)
-		.reset_in6      (1'b0),                                   // (terminated)
-		.reset_req_in6  (1'b0),                                   // (terminated)
-		.reset_in7      (1'b0),                                   // (terminated)
-		.reset_req_in7  (1'b0),                                   // (terminated)
-		.reset_in8      (1'b0),                                   // (terminated)
-		.reset_req_in8  (1'b0),                                   // (terminated)
-		.reset_in9      (1'b0),                                   // (terminated)
-		.reset_req_in9  (1'b0),                                   // (terminated)
-		.reset_in10     (1'b0),                                   // (terminated)
-		.reset_req_in10 (1'b0),                                   // (terminated)
-		.reset_in11     (1'b0),                                   // (terminated)
-		.reset_req_in11 (1'b0),                                   // (terminated)
-		.reset_in12     (1'b0),                                   // (terminated)
-		.reset_req_in12 (1'b0),                                   // (terminated)
-		.reset_in13     (1'b0),                                   // (terminated)
-		.reset_req_in13 (1'b0),                                   // (terminated)
-		.reset_in14     (1'b0),                                   // (terminated)
-		.reset_req_in14 (1'b0),                                   // (terminated)
-		.reset_in15     (1'b0),                                   // (terminated)
-		.reset_req_in15 (1'b0)                                    // (terminated)
-	);
-
-	altera_reset_controller #(
 		.NUM_RESET_INPUTS          (1),
 		.OUTPUT_RESET_SYNC_EDGES   ("deassert"),
 		.SYNC_DEPTH                (2),
@@ -486,10 +395,10 @@ module gifplayer_soc (
 		.USE_RESET_REQUEST_IN14    (0),
 		.USE_RESET_REQUEST_IN15    (0),
 		.ADAPT_RESET_REQUEST       (0)
-	) rst_controller_002 (
+	) rst_controller_001 (
 		.reset_in0      (~reset_reset_n),                     // reset_in0.reset
 		.clk            (clk_clk),                            //       clk.clk
-		.reset_out      (rst_controller_002_reset_out_reset), // reset_out.reset
+		.reset_out      (rst_controller_001_reset_out_reset), // reset_out.reset
 		.reset_req      (),                                   // (terminated)
 		.reset_req_in0  (1'b0),                               // (terminated)
 		.reset_in1      (1'b0),                               // (terminated)
@@ -522,6 +431,69 @@ module gifplayer_soc (
 		.reset_req_in14 (1'b0),                               // (terminated)
 		.reset_in15     (1'b0),                               // (terminated)
 		.reset_req_in15 (1'b0)                                // (terminated)
+	);
+
+	altera_reset_controller #(
+		.NUM_RESET_INPUTS          (2),
+		.OUTPUT_RESET_SYNC_EDGES   ("deassert"),
+		.SYNC_DEPTH                (2),
+		.RESET_REQUEST_PRESENT     (1),
+		.RESET_REQ_WAIT_TIME       (1),
+		.MIN_RST_ASSERTION_TIME    (3),
+		.RESET_REQ_EARLY_DSRT_TIME (1),
+		.USE_RESET_REQUEST_IN0     (0),
+		.USE_RESET_REQUEST_IN1     (0),
+		.USE_RESET_REQUEST_IN2     (0),
+		.USE_RESET_REQUEST_IN3     (0),
+		.USE_RESET_REQUEST_IN4     (0),
+		.USE_RESET_REQUEST_IN5     (0),
+		.USE_RESET_REQUEST_IN6     (0),
+		.USE_RESET_REQUEST_IN7     (0),
+		.USE_RESET_REQUEST_IN8     (0),
+		.USE_RESET_REQUEST_IN9     (0),
+		.USE_RESET_REQUEST_IN10    (0),
+		.USE_RESET_REQUEST_IN11    (0),
+		.USE_RESET_REQUEST_IN12    (0),
+		.USE_RESET_REQUEST_IN13    (0),
+		.USE_RESET_REQUEST_IN14    (0),
+		.USE_RESET_REQUEST_IN15    (0),
+		.ADAPT_RESET_REQUEST       (0)
+	) rst_controller_002 (
+		.reset_in0      (~reset_reset_n),                         // reset_in0.reset
+		.reset_in1      (nios2_gen2_0_debug_reset_request_reset), // reset_in1.reset
+		.clk            (clk_clk),                                //       clk.clk
+		.reset_out      (rst_controller_002_reset_out_reset),     // reset_out.reset
+		.reset_req      (rst_controller_002_reset_out_reset_req), //          .reset_req
+		.reset_req_in0  (1'b0),                                   // (terminated)
+		.reset_req_in1  (1'b0),                                   // (terminated)
+		.reset_in2      (1'b0),                                   // (terminated)
+		.reset_req_in2  (1'b0),                                   // (terminated)
+		.reset_in3      (1'b0),                                   // (terminated)
+		.reset_req_in3  (1'b0),                                   // (terminated)
+		.reset_in4      (1'b0),                                   // (terminated)
+		.reset_req_in4  (1'b0),                                   // (terminated)
+		.reset_in5      (1'b0),                                   // (terminated)
+		.reset_req_in5  (1'b0),                                   // (terminated)
+		.reset_in6      (1'b0),                                   // (terminated)
+		.reset_req_in6  (1'b0),                                   // (terminated)
+		.reset_in7      (1'b0),                                   // (terminated)
+		.reset_req_in7  (1'b0),                                   // (terminated)
+		.reset_in8      (1'b0),                                   // (terminated)
+		.reset_req_in8  (1'b0),                                   // (terminated)
+		.reset_in9      (1'b0),                                   // (terminated)
+		.reset_req_in9  (1'b0),                                   // (terminated)
+		.reset_in10     (1'b0),                                   // (terminated)
+		.reset_req_in10 (1'b0),                                   // (terminated)
+		.reset_in11     (1'b0),                                   // (terminated)
+		.reset_req_in11 (1'b0),                                   // (terminated)
+		.reset_in12     (1'b0),                                   // (terminated)
+		.reset_req_in12 (1'b0),                                   // (terminated)
+		.reset_in13     (1'b0),                                   // (terminated)
+		.reset_req_in13 (1'b0),                                   // (terminated)
+		.reset_in14     (1'b0),                                   // (terminated)
+		.reset_req_in14 (1'b0),                                   // (terminated)
+		.reset_in15     (1'b0),                                   // (terminated)
+		.reset_req_in15 (1'b0)                                    // (terminated)
 	);
 
 	altera_reset_controller #(
