@@ -23,7 +23,7 @@
 //-------------------------------------------------------------------------
 
 
-module  VGA_controller (input              Clk,         // 50 MHz clock
+module  vga_controller (input              Clk,         // 50 MHz clock
                                            Reset,       // Active-high reset signal
                         output logic       VGA_HS,      // Horizontal sync pulse.  Active low
                                            VGA_VS,      // Vertical sync pulse.  Active low

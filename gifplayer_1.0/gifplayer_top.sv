@@ -94,6 +94,16 @@ module gifplayer_top (
         .VGA_BLANK_N(VGA_BLANK_N),
     );
 
+	// Decides what color to color the current pixel
+	// Need to add signals and another module to get color data from memory
+	color_mapper color_mapper_instance(
+        .DrawX(DrawX), 
+        .DrawY(DrawY), 
+        .VGA_R(VGA_R),
+        .VGA_G(VGA_G), 
+        .VGA_B(VGA_B)
+	);
+
 	// Hex might be used for diagnostics or keycode. Right now it just says ECE
 	hexdriver hexdrv0 (
 		.In(4'b1110),
