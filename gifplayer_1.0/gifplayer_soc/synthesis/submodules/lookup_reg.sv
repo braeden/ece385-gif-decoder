@@ -86,10 +86,10 @@ always_ff @(posedge CLK) begin
 	// EXPORT_DATA[31:16] <= regs[0][31:16];
 	// EXPORT_DATA[15:0] <= regs[3][15:0];
 
-    for (int i = 0; i<258; i++) {
+    for (int i = 0; i<258; i++) begin
         //EXPORT_DATA[(i+1)*31:i*31]
-        EXPORT_DATA[32*i+31:32*i] <= regs[i];
-    }
+        EXPORT_DATA[32*i +: 32] <= regs[i];
+    end
 
 end
 

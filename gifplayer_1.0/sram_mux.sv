@@ -25,7 +25,7 @@ module sram_mux(
     output wire          sram_wire_UB_N_out,            //              .UB_N
     output wire          sram_wire_CE_N_out,            //              .CE_N
     output wire          sram_wire_OE_N_out,            //              .OE_N
-    output wire          sram_wire_WE_N_out,            //              .WE_N
+    output wire          sram_wire_WE_N_out            //              .WE_N
 );
 
 always_comb begin

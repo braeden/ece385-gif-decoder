@@ -135,7 +135,7 @@ module gifplayer_top (
         .DrawX(DrawX),
         .VGA_HS(VGA_HS),
         .VGA_VS(VGA_VS),
-        .VGA_BLANK_N(VGA_BLANK_N),
+        .VGA_BLANK_N(VGA_BLANK_N)
     );
 
 	// frame_state_machine frame_state_machine_instance(

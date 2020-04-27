@@ -1,7 +1,7 @@
 module frame_manager ( 
-    input logic Clk, Reset
+    input logic Clk, Reset,
     input logic [9:0] DrawX, DrawY,
-    input VGA_CLK,
+    input logic VGA_CLK,
     input logic [8:0][31:0] lookup_table,
     input logic [16:0] width, height,
     input logic [8:0] totalFrameCount,
@@ -50,7 +50,8 @@ module frame_manager (
         sram_wire_LB_N = 1'b1; //F
         sram_wire_CE_N = 1'b0; //T
         sram_wire_OE_N = 1'b0; //T
-        
+        currentColors = 32'b0;
+        sram_wire_ADDR = 19'b0;
         
         if (HARDWARE_EN) begin
             sram_wire_ADDR = 8'bX;
@@ -60,7 +61,7 @@ module frame_manager (
                 currentColors = lookup_table[sram_wire_DQ[15:8]];
                 VGA_R = currentColors[31:24];
                 VGA_G = currentColors[23:16];
-                VGA_B = currentColors[15:0];
+                VGA_B = currentColors[15:8];
             end
 
         end
