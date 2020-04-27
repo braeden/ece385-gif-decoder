@@ -48,7 +48,7 @@ module gifplayer_top (
 );
 
     logic Reset_h, Clk;
-    //logic [9:0] DrawX, DrawY;
+    logic [9:0] DrawX, DrawY;
     
     assign Clk = CLOCK_50;
     always_ff @ (posedge Clk) begin
@@ -57,45 +57,56 @@ module gifplayer_top (
 
 	// Instantiation of Qsys design
 	gifplayer_soc gifplayer_soc (
-		.clk_clk(CLOCK_50),								// Clock input
-		.reset_reset_n(KEY[0]),							// Reset key
-		.sdram_wire_addr(DRAM_ADDR),					// sdram_wire.addr
-		.sdram_wire_ba(DRAM_BA),						// sdram_wire.ba
-		.sdram_wire_cas_n(DRAM_CAS_N),					// sdram_wire.cas_n
-		.sdram_wire_cke(DRAM_CKE),						// sdram_wire.cke
-		.sdram_wire_cs_n(DRAM_CS_N),					// sdram.cs_n
-		.sdram_wire_dq(DRAM_DQ),						// sdram.dq
-		.sdram_wire_dqm(DRAM_DQM),						// sdram.dqm
-		.sdram_wire_ras_n(DRAM_RAS_N),					// sdram.ras_n
-		.sdram_wire_we_n(DRAM_WE_N),					// sdram.we_n
-		.sdram_clk_clk(DRAM_CLK),						// Clock out to SDRAM
+		.clk_clk(Clk),
+		.reset_reset_n(1'b1),			// Never reset the NIOS
+		.sdram_wire_addr(DRAM_ADDR),
+		.sdram_wire_ba(DRAM_BA),
+		.sdram_wire_cas_n(DRAM_CAS_N),
+		.sdram_wire_cke(DRAM_CKE),
+		.sdram_wire_cs_n(DRAM_CS_N),
+		.sdram_wire_dq(DRAM_DQ),
+		.sdram_wire_dqm(DRAM_DQM),
+		.sdram_wire_ras_n(DRAM_RAS_N),
+		.sdram_wire_we_n(DRAM_WE_N),
+		.sdram_clk_clk(DRAM_CLK),
 		.sw_wire_export(SW),
-		.sram_wire_DQ(SRAM_DQ),     					//  sram_wire.DQ
-		.sram_wire_ADDR(SRAM_ADDR),   					//           .ADDR
-		.sram_wire_LB_N(SRAM_LB_N),   					//           .LB_N
-		.sram_wire_UB_N(SRAM_UB_N),   					//           .UB_N
-		.sram_wire_CE_N(SRAM_CE_N),   					//           .CE_N
-		.sram_wire_OE_N(SRAM_OE_N),   					//           .OE_N
-		.sram_wire_WE_N(SRAM_WE_N)   					//           .WE_N
+		.sram_wire_DQ(SRAM_DQ),
+		.sram_wire_ADDR(SRAM_ADDR),
+		.sram_wire_LB_N(SRAM_LB_N),
+		.sram_wire_UB_N(SRAM_UB_N),
+		.sram_wire_CE_N(SRAM_CE_N),
+		.sram_wire_OE_N(SRAM_OE_N),
+		.sram_wire_WE_N(SRAM_WE_N)
 	);
 
-
-	// VGA_CLK needs to be 25 MHz
+	// VGA_CLK needs to be 25 MHz, so we give it a special clock
 	vga_clk vga_clk_instance(.inclk0(Clk), .c0(VGA_CLK) );
 
-	// Hex display will display something.
+	// This module mostly controls which pixel we are coloring at each moment, I think
+	vga_controller vga_controller_instance(
+        .Clk(Clk), 
+        .Reset(Reset_h), 
+        .VGA_CLK(VGA_CLK),
+        .DrawY(DrawY), 
+        .DrawX(DrawX),
+        .VGA_HS(VGA_HS),
+        .VGA_VS(VGA_VS),
+        .VGA_BLANK_N(VGA_BLANK_N),
+    );
+
+	// Hex might be used for diagnostics or keycode. Right now it just says ECE
 	hexdriver hexdrv0 (
-		.In(4'b0000),
+		.In(4'b1110),
 		.Out(HEX0)
 	);
 	hexdriver hexdrv1 (
-		.In(4'b1111),
+		.In(4'b1100),
 		.Out(HEX1)
 	);
-	// hexdriver hexdrv2 (
-	// 	.In(AES_EXPORT_DATA[11:8]),
-	//    .Out(HEX2)
-	// );
+	hexdriver hexdrv2 (
+		.In(4'b1110),
+	    .Out(HEX2)
+	);
 	// hexdriver hexdrv3 (
 	// 	.In(AES_EXPORT_DATA[15:12]),
 	//    .Out(HEX3)
