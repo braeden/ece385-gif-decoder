@@ -11,8 +11,8 @@ static unsigned char *frameptr = 0x00419450;
 
 
 unsigned char *fileptr;
-unsigned int32_t *ocmptr;
-int ON_NIOS = 0;
+uint32_t *ocmptr;
+int ON_NIOS = 1;
 
 
 void checkPacked() {
@@ -79,7 +79,8 @@ int main() {
 //			printf("\n");
 //		}
 //	}
-//
+//	ocmptr[0] = 0x1234;
+////
 //	exit(0);
 
 	HeaderBlock header;
@@ -244,7 +245,7 @@ int main() {
 
 
 		ocmptr[256] = 0;
-		ocmptr[256] += descriptor.canvasWidth;
+		ocmptr[256] += descriptor.canvasWidth<<16;
 		ocmptr[256] += descriptor.canvasHeight;
 
 		ocmptr[257] = 0;

@@ -2,7 +2,7 @@ module frame_manager (
     input logic Clk, Reset,
     input logic [9:0] DrawX, DrawY,
     input logic VGA_CLK,
-    input logic [8:0][31:0] lookup_table,
+    input logic [257:0][31:0] lookup_table,
     input logic [16:0] width, height,
     input logic [8:0] totalFrameCount,
     input logic HARDWARE_EN,
@@ -55,7 +55,7 @@ module frame_manager (
         
         if (HARDWARE_EN) begin
             sram_wire_ADDR = 8'bX;
-            if (DrawX < width && DrawY < height) begin
+            if (DrawX < width && DrawY < height) begin //suspect
                 sram_wire_ADDR = 19'h19450+(currentFrameCount*height*width)+DrawY*width+DrawX;
                 //fix this later to switch upper/lower bytes
                 currentColors = lookup_table[sram_wire_DQ[15:8]];

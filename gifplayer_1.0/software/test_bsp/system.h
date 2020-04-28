@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2_0' in SOPC Builder design 'gifplayer_soc'
  * SOPC Builder design path: ../../gifplayer_soc.sopcinfo
  *
- * Generated: Fri Apr 24 20:44:25 CDT 2020
+ * Generated: Mon Apr 27 20:30:35 CDT 2020
  */
 
 /*
@@ -62,7 +62,7 @@
 
 #define ALT_CPU_ARCHITECTURE "altera_nios2_gen2"
 #define ALT_CPU_BIG_ENDIAN 0
-#define ALT_CPU_BREAK_ADDR 0x00001020
+#define ALT_CPU_BREAK_ADDR 0x00001820
 #define ALT_CPU_CPU_ARCH_NIOS2_R1
 #define ALT_CPU_CPU_FREQ 50000000u
 #define ALT_CPU_CPU_ID_SIZE 1
@@ -99,7 +99,7 @@
  */
 
 #define NIOS2_BIG_ENDIAN 0
-#define NIOS2_BREAK_ADDR 0x00001020
+#define NIOS2_BREAK_ADDR 0x00001820
 #define NIOS2_CPU_ARCH_NIOS2_R1
 #define NIOS2_CPU_FREQ 50000000u
 #define NIOS2_CPU_ID_SIZE 1
@@ -135,12 +135,12 @@
 
 #define __ALTERA_AVALON_JTAG_UART
 #define __ALTERA_AVALON_NEW_SDRAM_CONTROLLER
-#define __ALTERA_AVALON_ONCHIP_MEMORY2
 #define __ALTERA_AVALON_PIO
 #define __ALTERA_AVALON_SYSID_QSYS
 #define __ALTERA_NIOS2_GEN2
 #define __ALTERA_UP_AVALON_SRAM
 #define __ALTPLL
+#define __LOOKUP
 
 
 /*
@@ -159,19 +159,19 @@
 #define ALT_NUM_INTERNAL_INTERRUPT_CONTROLLERS 1
 #define ALT_NUM_INTERRUPT_CONTROLLERS 1
 #define ALT_STDERR "/dev/jtag_uart_0"
-#define ALT_STDERR_BASE 0x60
+#define ALT_STDERR_BASE 0x2050
 #define ALT_STDERR_DEV jtag_uart_0
 #define ALT_STDERR_IS_JTAG_UART
 #define ALT_STDERR_PRESENT
 #define ALT_STDERR_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDIN "/dev/jtag_uart_0"
-#define ALT_STDIN_BASE 0x60
+#define ALT_STDIN_BASE 0x2050
 #define ALT_STDIN_DEV jtag_uart_0
 #define ALT_STDIN_IS_JTAG_UART
 #define ALT_STDIN_PRESENT
 #define ALT_STDIN_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDOUT "/dev/jtag_uart_0"
-#define ALT_STDOUT_BASE 0x60
+#define ALT_STDOUT_BASE 0x2050
 #define ALT_STDOUT_DEV jtag_uart_0
 #define ALT_STDOUT_IS_JTAG_UART
 #define ALT_STDOUT_PRESENT
@@ -204,7 +204,7 @@
  */
 
 #define ALT_MODULE_CLASS_jtag_uart_0 altera_avalon_jtag_uart
-#define JTAG_UART_0_BASE 0x60
+#define JTAG_UART_0_BASE 0x2050
 #define JTAG_UART_0_IRQ 0
 #define JTAG_UART_0_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define JTAG_UART_0_NAME "/dev/jtag_uart_0"
@@ -217,32 +217,17 @@
 
 
 /*
- * onchip_memory2_0 configuration
+ * lookup_0 configuration
  *
  */
 
-#define ALT_MODULE_CLASS_onchip_memory2_0 altera_avalon_onchip_memory2
-#define ONCHIP_MEMORY2_0_ALLOW_IN_SYSTEM_MEMORY_CONTENT_EDITOR 0
-#define ONCHIP_MEMORY2_0_ALLOW_MRAM_SIM_CONTENTS_ONLY_FILE 0
-#define ONCHIP_MEMORY2_0_BASE 0x0
-#define ONCHIP_MEMORY2_0_CONTENTS_INFO ""
-#define ONCHIP_MEMORY2_0_DUAL_PORT 0
-#define ONCHIP_MEMORY2_0_GUI_RAM_BLOCK_TYPE "AUTO"
-#define ONCHIP_MEMORY2_0_INIT_CONTENTS_FILE "gifplayer_soc_onchip_memory2_0"
-#define ONCHIP_MEMORY2_0_INIT_MEM_CONTENT 1
-#define ONCHIP_MEMORY2_0_INSTANCE_ID "NONE"
-#define ONCHIP_MEMORY2_0_IRQ -1
-#define ONCHIP_MEMORY2_0_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define ONCHIP_MEMORY2_0_NAME "/dev/onchip_memory2_0"
-#define ONCHIP_MEMORY2_0_NON_DEFAULT_INIT_FILE_ENABLED 0
-#define ONCHIP_MEMORY2_0_RAM_BLOCK_TYPE "AUTO"
-#define ONCHIP_MEMORY2_0_READ_DURING_WRITE_MODE "DONT_CARE"
-#define ONCHIP_MEMORY2_0_SINGLE_CLOCK_OP 0
-#define ONCHIP_MEMORY2_0_SIZE_MULTIPLE 1
-#define ONCHIP_MEMORY2_0_SIZE_VALUE 16
-#define ONCHIP_MEMORY2_0_SPAN 16
-#define ONCHIP_MEMORY2_0_TYPE "altera_avalon_onchip_memory2"
-#define ONCHIP_MEMORY2_0_WRITABLE 1
+#define ALT_MODULE_CLASS_lookup_0 lookup
+#define LOOKUP_0_BASE 0x1000
+#define LOOKUP_0_IRQ -1
+#define LOOKUP_0_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define LOOKUP_0_NAME "/dev/lookup_0"
+#define LOOKUP_0_SPAN 2048
+#define LOOKUP_0_TYPE "lookup"
 
 
 /*
@@ -290,7 +275,7 @@
  */
 
 #define ALT_MODULE_CLASS_sdram_pll altpll
-#define SDRAM_PLL_BASE 0x40
+#define SDRAM_PLL_BASE 0x2030
 #define SDRAM_PLL_IRQ -1
 #define SDRAM_PLL_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SDRAM_PLL_NAME "/dev/sdram_pll"
@@ -318,7 +303,7 @@
  */
 
 #define ALT_MODULE_CLASS_switches altera_avalon_pio
-#define SWITCHES_BASE 0x30
+#define SWITCHES_BASE 0x2020
 #define SWITCHES_BIT_CLEARING_EDGE_REGISTER 0
 #define SWITCHES_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define SWITCHES_CAPTURE 0
@@ -345,13 +330,13 @@
  */
 
 #define ALT_MODULE_CLASS_sysid_qsys_0 altera_avalon_sysid_qsys
-#define SYSID_QSYS_0_BASE 0x58
+#define SYSID_QSYS_0_BASE 0x2048
 #define SYSID_QSYS_0_ID 0
 #define SYSID_QSYS_0_IRQ -1
 #define SYSID_QSYS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_0_NAME "/dev/sysid_qsys_0"
 #define SYSID_QSYS_0_SPAN 8
-#define SYSID_QSYS_0_TIMESTAMP 1587510466
+#define SYSID_QSYS_0_TIMESTAMP 1588036387
 #define SYSID_QSYS_0_TYPE "altera_avalon_sysid_qsys"
 
 #endif /* __SYSTEM_H_ */

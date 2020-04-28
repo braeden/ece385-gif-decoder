@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2_0' in SOPC Builder design 'gifplayer_soc'
  * SOPC Builder design path: ../../gifplayer_soc.sopcinfo
  *
- * Generated: Tue Apr 21 20:04:15 CDT 2020
+ * Generated: Mon Apr 27 20:30:35 CDT 2020
  */
 
 /*
@@ -65,8 +65,6 @@
  *
  */
 
-#define ONCHIP_MEMORY2_0_REGION_BASE 0x0
-#define ONCHIP_MEMORY2_0_REGION_SPAN 16
 #define RESET_REGION_BASE 0x10000000
 #define RESET_REGION_SPAN 32
 #define SDRAM_REGION_BASE 0x10000020

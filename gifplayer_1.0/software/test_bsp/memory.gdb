@@ -3,7 +3,7 @@
 # Machine generated for CPU 'nios2_gen2_0' in SOPC Builder design 'gifplayer_soc'
 # SOPC Builder design path: ../../gifplayer_soc.sopcinfo
 #
-# Generated: Tue Apr 21 20:04:15 CDT 2020
+# Generated: Mon Apr 27 20:30:35 CDT 2020
 
 # DO NOT MODIFY THIS FILE
 #
@@ -45,9 +45,6 @@
 # Define memory regions for each memory connected to the CPU.
 # The cache attribute is specified which improves GDB performance
 # by allowing GDB to cache memory contents on the host.
-
-# onchip_memory2_0
-memory 0x0 0x10 cache
 
 # sdram
 memory 0x10000000 0x18000000 cache
