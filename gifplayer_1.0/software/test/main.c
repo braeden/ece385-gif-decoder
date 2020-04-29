@@ -3,17 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "gif_data.h"
 #include "lzw.h"
 #include "structs.h"
 
 static char VALID_HEADER[3] = "GIF";
-static unsigned char *frameptr = 0x00419450;
-
+static unsigned char *frameptr = (char *)0x00419450;
+static uint32_t *ocmptr = (uint32_t *)0x00001000;
+static int ON_NIOS = 0;
 
 unsigned char *fileptr;
-uint32_t *ocmptr;
-int ON_NIOS = 1;
-
 
 void checkPacked() {
 	assert(sizeof(HeaderBlock) == 6);
@@ -23,7 +22,7 @@ void checkPacked() {
 	assert(sizeof(colorTableEntry) == 3);
 }
 
-unsigned char *read(unsigned char *dest, int size, int segments, unsigned char *src) {
+unsigned char *read(void *dest, int size, int segments, unsigned char *src) {
 	memcpy(dest, src, size * segments);
 	return src + size * segments;
 }
@@ -38,54 +37,62 @@ unsigned char *seek(unsigned char *ptr, int size) {
 }
 
 void skipToTerm() {
-	while (getch(fileptr) != 0x00)
+	while (getch(fileptr) != 0x00) {
 		fileptr++;
-	printf("skipping");
+	}
+	printf("Skipping!\n");
+
+	fileptr++;
+}
+
+void writeSRAM() {
+	for (int i = 0; i < _gif_len; i++) {
+		fileptr[i] = _gif[i];
+	}
+	for (int i = 0; i < _gif_len; i++) {
+		assert(fileptr[i] == _gif[i]);
+	}
 }
 
 int main() {
 	checkPacked();
 
-	//Open file locally:
-//	printf("here\n");
-//	FILE *f = NULL;
-//	 f = fopen("/mnt/host/sample1.gif", "rb");
-//	 if (f == NULL) {
-//		 printf("File not load !\n");
-//		 exit(0);
-//	 }
-//	 fseek(f, 0, SEEK_END);
-//	 long fsize = ftell(f);
-//	 fseek(f, 0, SEEK_SET);
-//
-//	 fileptr = malloc(fsize + 1);
-//	 fread(fileptr, 1, fsize, f);
-//	 fclose(f);
+	unsigned char *fileChunk = NULL;
 
-	////////////////////////////////////////////
+	if (!ON_NIOS) {
+		FILE *f = NULL;
+		f = fopen("sampleanim2.gif", "rb");
+		if (f == NULL) {
+			printf("File not load !\n");
+			exit(0);
+		}
+		fseek(f, 0, SEEK_END);
+		long fsize = ftell(f);
+		fseek(f, 0, SEEK_SET);
 
-	//Set pointer from SRAM
-	fileptr = 0x00400050;
-	ocmptr = 0x00001000;
+		fileChunk = malloc(fsize + 1);
+		fileptr = fileChunk;
+		fread(fileptr, 1, fsize, f);
+		fclose(f);
+	} else {
+		//Set pointer from SRAM
+		fileptr = 0x00400050;
+	}
+	// Write SRAM if we want:
+	// writeSRAM();
 
-//	*fileptr = 0x68;
-//	fileptr++;
-//	*fileptr = 0xA5;
-//	fileptr = 0x00400002;
-
-//	for (int i = 0; i < 100; i++) {
-//		printf("%02x, ", fileptr[i]);
-//		if (!((i+1)%16)) {
-//			printf("\n");
-//		}
-//	}
-//	ocmptr[0] = 0x1234;
-////
-//	exit(0);
+	//	for (int i = 0; i < 100; i++) {
+	//		printf("%02x, ", fileptr[i]);
+	//		if (!((i+1)%16)) {
+	//			printf("\n");
+	//		}
+	//	}
+	//	ocmptr[0] = 0x1234;
+	////
+	//	exit(0);
 
 	HeaderBlock header;
 	LSD descriptor;
-	printf("%lu \n", sizeof(header));
 
 	fileptr = read(&header, 1, sizeof(header), fileptr);
 	fileptr = read(&descriptor, 1, sizeof(descriptor), fileptr);
@@ -99,10 +106,10 @@ int main() {
 	colorTableEntry *globalTable = (colorTableEntry *)
 		malloc(readlGlobalColorSize * sizeof(colorTableEntry));	 // We can make this 256 for hardware
 
+	printf("Dimensions (Canvas): %dx%d\n", descriptor.canvasWidth, descriptor.canvasHeight);
+
 	//Read global color table and print it
 	fileptr = read(globalTable, 3, readlGlobalColorSize, fileptr);
-
-
 
 	for (int i = 0; i < readlGlobalColorSize; i++) {
 		printf("[#");
@@ -117,7 +124,6 @@ int main() {
 
 	int8_t totalFrameCount = 0;
 	while (1) {
-		printf("herehere\n");
 		GCE gce;
 		imageDescriptor imgDesc;
 		colorTableEntry *localTable = NULL;
@@ -170,6 +176,7 @@ int main() {
 		assert(imgDesc.imgSeperator == 0x2C);
 		if (imgDesc.packedField.localColorFlag) {
 			// Load a local color table
+			printf("Local color table\n");
 			int realLocalColorSize = 0x2 << imgDesc.packedField.localColorSize;	 // 2^(N+1) actual colors
 			localTable = (colorTableEntry *)
 				malloc(realLocalColorSize * sizeof(colorTableEntry));
@@ -186,32 +193,34 @@ int main() {
 		fileptr++;
 		while (bytesInSubblock) {
 			data = realloc(data, (sizeof(char) * (dataSize + bytesInSubblock)));
-			fileptr = read(data, 1, bytesInSubblock, fileptr);
+			fileptr = read(data + dataSize, 1, bytesInSubblock, fileptr);
 			dataSize += bytesInSubblock;
 			bytesInSubblock = getch(fileptr);
 			fileptr++;
 		}
-//
-		for (int i = 0; i < dataSize; i++) {
-			printf("%02x,", data[i]);
-			if (!(i%10)) {
-				printf("\n");
-			}
-		}
-		printf("\n");
+		// printf("\n");
+		// for (int i = 0; i < dataSize; i++) {
+		// 	printf("%02x,", data[i]);
+		// 	if (!(i % 10)) {
+		// 		printf("\n");
+		// 	}
+		// }
+		// printf("\n");
 		unsigned char *dataOut = malloc(imgDesc.imgHeight * imgDesc.imgWidth);
-//
+		//
 		// // Write developed image frame to some sort of storage
 		uncompress(LZWMinCode, data, dataSize, dataOut);
-//		 for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
-//		 	if (i % imgDesc.imgWidth == 0) {
-//		 		printf("\n");
-//		 	}
-////		 	printf("\033[38;5;%dm", dataOut[i]);
-//		 	printf("%02x ", dataOut[i]);
-////		 	printf("\033[0m");
-//		 }
-		memcpy(frameptr, dataOut, imgDesc.imgHeight*imgDesc.imgWidth);
+		// for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
+		// 	if (i % imgDesc.imgWidth == 0) {
+		// 		printf("\n");
+		// 	}
+		// 	printf("\033[38;5;%dm", dataOut[i]);
+		// 	printf("%02x ", dataOut[i]);
+		// 	printf("\033[0m");
+		// }
+		if (ON_NIOS) {
+			memcpy(frameptr, dataOut, imgDesc.imgHeight * imgDesc.imgWidth);
+		}
 
 		// Here we have completed image data
 		// We should write: check if localColorFlag then use that to grab colors from data[i]
@@ -221,11 +230,11 @@ int main() {
 		// and break loop!
 		c = getch(fileptr);
 
-		printf("\nFrame done\n");
+		printf("\nFrame done: %d | size: %dx%d\n", totalFrameCount, imgDesc.imgWidth, imgDesc.imgHeight);
 
 		free(localTable);
 		free(data);
-		//	 		free(dataOut);
+		free(dataOut);
 		if (c == 0x3B) {
 			printf("\nEOF found\n");
 			break;
@@ -234,25 +243,22 @@ int main() {
 	}
 
 	if (ON_NIOS) {
-		for (int i = 0; i<258; i++) {
+		for (int i = 0; i < 258; i++) {
 			ocmptr[i] = 0;
 		}
-		for (int i = 0; i<readlGlobalColorSize; i++) {
-			for (int j = 0; j<3; j++) {
-				ocmptr[i] += globalTable[i].RGB[j]<< (24-j*8);
+		for (int i = 0; i < readlGlobalColorSize; i++) {
+			for (int j = 0; j < 3; j++) {
+				ocmptr[i] += globalTable[i].RGB[j] << (24 - j * 8);
 			}
 		}
 
-
-		ocmptr[256] = 0;
-		ocmptr[256] += descriptor.canvasWidth<<16;
+		ocmptr[256] += descriptor.canvasWidth << 16;
 		ocmptr[256] += descriptor.canvasHeight;
 
-		ocmptr[257] = 0;
-		ocmptr[257] += totalFrameCount<<24; //last set of bytes
+		ocmptr[257] += totalFrameCount << 24;  //last set of bytes
 		ocmptr[257] += 1;
 	}
-
+	free(fileChunk);
 	free(globalTable);
 	printf("\n");
 	printf("\nDONE\n");
