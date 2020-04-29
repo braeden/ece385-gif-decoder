@@ -8,7 +8,7 @@
 #include "structs.h"
 
 static char VALID_HEADER[3] = "GIF";
-static unsigned char *frameptr = (char *)0x00419450;
+static unsigned char *frameptr = (unsigned char *)0x00419450;
 static uint32_t *ocmptr = (uint32_t *)0x00001000;
 static int ON_NIOS = 0;
 
@@ -54,6 +54,19 @@ void writeSRAM() {
 	}
 }
 
+void printAligned(unsigned char *ptr, int width, int size, int color) {
+	for (int i = 0; i < size; i++) {
+		if (i % width == 0) {
+			printf("\n");
+		}
+		if (color)
+			printf("\033[38;5;%dm", ptr[i]);
+		printf("%02x", ptr[i]);
+	}
+	printf("\033[0m");
+	printf("\n");
+}
+
 int main() {
 	checkPacked();
 
@@ -61,9 +74,9 @@ int main() {
 
 	if (!ON_NIOS) {
 		FILE *f = NULL;
-		f = fopen("sampleanim2.gif", "rb");
+		f = fopen("sampleanim.gif", "rb");
 		if (f == NULL) {
-			printf("File not load !\n");
+			printf("File did not load!\n");
 			exit(0);
 		}
 		fseek(f, 0, SEEK_END);
@@ -76,20 +89,10 @@ int main() {
 		fclose(f);
 	} else {
 		//Set pointer from SRAM
-		fileptr = 0x00400050;
+		fileptr = (unsigned char *)0x00400050;
 	}
 	// Write SRAM if we want:
 	// writeSRAM();
-
-	//	for (int i = 0; i < 100; i++) {
-	//		printf("%02x, ", fileptr[i]);
-	//		if (!((i+1)%16)) {
-	//			printf("\n");
-	//		}
-	//	}
-	//	ocmptr[0] = 0x1234;
-	////
-	//	exit(0);
 
 	HeaderBlock header;
 	LSD descriptor;
@@ -102,7 +105,6 @@ int main() {
 	assert(descriptor.packedField.globalColorFlag);	 //For all intents we're going to need a global table
 
 	int readlGlobalColorSize = 0x2 << descriptor.packedField.globalColorSize;  // 2^(N+1) actual colors
-	// printf("%d, %d\n", test, packed.actual_color_size);
 	colorTableEntry *globalTable = (colorTableEntry *)
 		malloc(readlGlobalColorSize * sizeof(colorTableEntry));	 // We can make this 256 for hardware
 
@@ -121,6 +123,9 @@ int main() {
 	printf("\n");
 
 	//////////////////////////////////////////////////
+	int canvasSize = descriptor.canvasWidth * descriptor.canvasHeight;
+	unsigned char *currentFrame = (char *)calloc(canvasSize, 1);	 // This holds the current full canvas size exported frame
+	//Hardware needs full canvas size frames, not variable each time.
 
 	int8_t totalFrameCount = 0;
 	while (1) {
@@ -198,36 +203,28 @@ int main() {
 			bytesInSubblock = getch(fileptr);
 			fileptr++;
 		}
-		// printf("\n");
-		// for (int i = 0; i < dataSize; i++) {
-		// 	printf("%02x,", data[i]);
-		// 	if (!(i % 10)) {
-		// 		printf("\n");
-		// 	}
-		// }
-		// printf("\n");
-		unsigned char *dataOut = malloc(imgDesc.imgHeight * imgDesc.imgWidth);
-		//
-		// // Write developed image frame to some sort of storage
+		unsigned char *dataOut = (unsigned char *)malloc(imgDesc.imgHeight * imgDesc.imgWidth);
+		// Write developed image frame to some sort of storage
 		uncompress(LZWMinCode, data, dataSize, dataOut);
-		// for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
-		// 	if (i % imgDesc.imgWidth == 0) {
-		// 		printf("\n");
-		// 	}
-		// 	printf("\033[38;5;%dm", dataOut[i]);
-		// 	printf("%02x ", dataOut[i]);
-		// 	printf("\033[0m");
-		// }
-		if (ON_NIOS) {
-			memcpy(frameptr, dataOut, imgDesc.imgHeight * imgDesc.imgWidth);
+
+		printf("\n%02x, %02x", imgDesc.imgTop, imgDesc.imgLeft);
+
+		// Update the full canvas from new dataOut data.
+		for (int x = 0; x < descriptor.canvasWidth; x++) {
+			for (int y = 0; y < descriptor.canvasHeight; y++) {
+				if (y >= imgDesc.imgTop && y < imgDesc.imgTop + imgDesc.imgHeight &&
+					x >= imgDesc.imgLeft && x < imgDesc.imgLeft + imgDesc.imgWidth) {
+					currentFrame[y * descriptor.canvasWidth + x] = dataOut[(y - imgDesc.imgTop) * imgDesc.imgWidth + (x - imgDesc.imgLeft)];
+				}
+			}
 		}
 
-		// Here we have completed image data
-		// We should write: check if localColorFlag then use that to grab colors from data[i]
-		// We also need to save the image dimensions and start cords.
+		// printAligned(dataOut, imgDesc.imgWidth, imgDesc.imgWidth * imgDesc.imgHeight, 1);
+		// printAligned(currentFrame, descriptor.canvasWidth, canvasSize, 1);
 
-		// Check if we're at end of file:
-		// and break loop!
+		if (ON_NIOS) {
+			memcpy(frameptr, currentFrame, canvasSize);
+		}
 		c = getch(fileptr);
 
 		printf("\nFrame done: %d | size: %dx%d\n", totalFrameCount, imgDesc.imgWidth, imgDesc.imgHeight);
@@ -259,6 +256,7 @@ int main() {
 		ocmptr[257] += 1;
 	}
 	free(fileChunk);
+	free(currentFrame);
 	free(globalTable);
 	printf("\n");
 	printf("\nDONE\n");
