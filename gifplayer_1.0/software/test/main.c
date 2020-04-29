@@ -10,7 +10,7 @@
 static char VALID_HEADER[3] = "GIF";
 static unsigned char *frameptr = (char *)0x00419450;
 static uint32_t *ocmptr = (uint32_t *)0x00001000;
-static int ON_NIOS = 0;
+static int ON_NIOS = 1;
 
 unsigned char *fileptr;
 
@@ -54,8 +54,13 @@ void writeSRAM() {
 	}
 }
 
+void getControl() {
+	ocmptr[257] = 0;
+}
+
 int main() {
 	checkPacked();
+	getControl();
 
 	unsigned char *fileChunk = NULL;
 
@@ -78,8 +83,8 @@ int main() {
 		//Set pointer from SRAM
 		fileptr = 0x00400050;
 	}
-	// Write SRAM if we want:
-	// writeSRAM();
+	 //Write SRAM if we want:
+	 writeSRAM();
 
 	//	for (int i = 0; i < 100; i++) {
 	//		printf("%02x, ", fileptr[i]);
@@ -219,8 +224,20 @@ int main() {
 		// 	printf("\033[0m");
 		// }
 		if (ON_NIOS) {
-			memcpy(frameptr, dataOut, imgDesc.imgHeight * imgDesc.imgWidth);
+			memcpy(frameptr + imgDesc.imgHeight*imgDesc.imgWidth * totalFrameCount, dataOut, imgDesc.imgHeight * imgDesc.imgWidth);
 		}
+		unsigned char * x = 0x00419450;
+		x[1] = 0x00;
+//		frameptr[0] = 0x00; //testing
+		 for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
+		 	if (i % imgDesc.imgWidth == 0) {
+		 		printf("\n");
+		 	}
+//		 	printf("\033[38;5;%dm", dataOut[i]);
+		 	printf("%02x ", frameptr[i]);
+//		 	printf("\033[0m");
+		 }
+
 
 		// Here we have completed image data
 		// We should write: check if localColorFlag then use that to grab colors from data[i]
@@ -244,17 +261,33 @@ int main() {
 
 	if (ON_NIOS) {
 		for (int i = 0; i < 258; i++) {
-			ocmptr[i] = 0;
+//			ocmptr[i] = 0;
+			ocmptr[i] = 0x00ff0000; //testing
 		}
-		for (int i = 0; i < readlGlobalColorSize; i++) {
-			for (int j = 0; j < 3; j++) {
-				ocmptr[i] += globalTable[i].RGB[j] << (24 - j * 8);
-			}
+		for (int i = 100; i < 258; i++) {
+//			ocmptr[i] = 0;
+			ocmptr[i] = 0xffff0000; //testing
 		}
+		for (int i = 200; i < 258; i++) {
+//			ocmptr[i] = 0;
+			ocmptr[i] = 0x00ffff00; //testing
+		}
+
+		ocmptr[255] = 0xffffff00;
+
+//		for (int i = 0; i < readlGlobalColorSize; i++) {
+//			for (int j = 0; j < 3; j++) {
+//				ocmptr[i] += globalTable[i].RGB[j] << (24 - j * 8);
+//			}
+//		}
+		ocmptr[256] = 0;
+		ocmptr[257] = 0;
+		ocmptr[0] = 0xffffffff; // testing
 
 		ocmptr[256] += descriptor.canvasWidth << 16;
 		ocmptr[256] += descriptor.canvasHeight;
-
+		//011f
+		//ff34
 		ocmptr[257] += totalFrameCount << 24;  //last set of bytes
 		ocmptr[257] += 1;
 	}

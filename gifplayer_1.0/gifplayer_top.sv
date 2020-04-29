@@ -111,12 +111,12 @@ module gifplayer_top (
 		.sdram_clk_clk(DRAM_CLK),						// Clock out to SDRAM
 		.sw_wire_export(SW),
 		.sram_wire_DQ(SRAM_DQ),     					//  sram_wire.DQ
-		.sram_wire_ADDR(SRAM_ADDR),   					//           .ADDR
-		.sram_wire_LB_N(SRAM_LB_N),   					//           .LB_N
-		.sram_wire_UB_N(SRAM_UB_N),   					//           .UB_N
-		.sram_wire_CE_N(SRAM_CE_N),   					//           .CE_N
-		.sram_wire_OE_N(SRAM_OE_N),   					//           .OE_N
-		.sram_wire_WE_N(SRAM_WE_N),   					//           .WE_N
+		.sram_wire_ADDR(SRAM_ADDR_SW),   					//           .ADDR
+		.sram_wire_LB_N(SRAM_LB_N_SW),   					//           .LB_N
+		.sram_wire_UB_N(SRAM_UB_N_SW),   					//           .UB_N
+		.sram_wire_CE_N(SRAM_CE_N_SW),   					//           .CE_N
+		.sram_wire_OE_N(SRAM_OE_N_SW),   					//           .OE_N
+		.sram_wire_WE_N(SRAM_WE_N_SW),   					//           .WE_N
 
 		.lookup_export_export_data(lookup_output)
 	);
@@ -175,7 +175,7 @@ module gifplayer_top (
 		.HARDWARE_EN(HARDWARE_EN),
 
 
-		.sram_wire_DQ(SRAM_DQ_HW),     					//  sram_wire.DQ
+		.sram_wire_DQ(SRAM_DQ),     					//  sram_wire.DQ
 		.sram_wire_ADDR(SRAM_ADDR_HW),   					//           .ADDR
 		.sram_wire_LB_N(SRAM_LB_N_HW),   					//           .LB_N
 		.sram_wire_UB_N(SRAM_UB_N_HW),   					//           .UB_N
@@ -189,34 +189,34 @@ module gifplayer_top (
 	);
 
 
-	// sram_mux sram_mux_instance (
-	// 	.select(1'b0),//HARDWARE_EN), // 0 = software, 1 = hardware
+	sram_mux sram_mux_instance (
+		.select(HARDWARE_EN), // 0 = software, 1 = hardware
 		
-	// 	.sram_wire_DQ_sw(SRAM_DQ_SW),     					//  sram_wire.DQ
-	// 	.sram_wire_ADDR_sw(SRAM_ADDR_SW),   					//           .ADDR
-	// 	.sram_wire_LB_N_sw(SRAM_LB_N_SW),   					//           .LB_N
-	// 	.sram_wire_UB_N_sw(SRAM_UB_N_SW),   					//           .UB_N
-	// 	.sram_wire_CE_N_sw(SRAM_CE_N_SW),   					//           .CE_N
-	// 	.sram_wire_OE_N_sw(SRAM_OE_N_SW),   					//           .OE_N
-	// 	.sram_wire_WE_N_sw(SRAM_WE_N_SW), 
+		// .sram_wire_DQ_sw(SRAM_DQ_SW),     					//  sram_wire.DQ
+		.sram_wire_ADDR_sw(SRAM_ADDR_SW),   					//           .ADDR
+		.sram_wire_LB_N_sw(SRAM_LB_N_SW),   					//           .LB_N
+		.sram_wire_UB_N_sw(SRAM_UB_N_SW),   					//           .UB_N
+		.sram_wire_CE_N_sw(SRAM_CE_N_SW),   					//           .CE_N
+		.sram_wire_OE_N_sw(SRAM_OE_N_SW),   					//           .OE_N
+		.sram_wire_WE_N_sw(SRAM_WE_N_SW), 
 		
-	// 	.sram_wire_DQ_hw(SRAM_DQ_HW),     					//  sram_wire.DQ
-	// 	.sram_wire_ADDR_hw(SRAM_ADDR_HW),   					//           .ADDR
-	// 	.sram_wire_LB_N_hw(SRAM_LB_N_HW),   					//           .LB_N
-	// 	.sram_wire_UB_N_hw(SRAM_UB_N_HW),   					//           .UB_N
-	// 	.sram_wire_CE_N_hw(SRAM_CE_N_HW),   					//           .CE_N
-	// 	.sram_wire_OE_N_hw(SRAM_OE_N_HW),   					//           .OE_N
-	// 	.sram_wire_WE_N_hw(SRAM_WE_N_HW), 
+		// .sram_wire_DQ_hw(SRAM_DQ_HW),     					//  sram_wire.DQ
+		.sram_wire_ADDR_hw(SRAM_ADDR_HW),   					//           .ADDR
+		.sram_wire_LB_N_hw(SRAM_LB_N_HW),   					//           .LB_N
+		.sram_wire_UB_N_hw(SRAM_UB_N_HW),   					//           .UB_N
+		.sram_wire_CE_N_hw(SRAM_CE_N_HW),   					//           .CE_N
+		.sram_wire_OE_N_hw(SRAM_OE_N_HW),   					//           .OE_N
+		.sram_wire_WE_N_hw(SRAM_WE_N_HW), 
 
-	// 	//outputs
-	// 	.sram_wire_DQ_out(SRAM_DQ),     					//  sram_wire.DQ
-	// 	.sram_wire_ADDR_out(SRAM_ADDR),   					//           .ADDR
-	// 	.sram_wire_LB_N_out(SRAM_LB_N),   					//           .LB_N
-	// 	.sram_wire_UB_N_out(SRAM_UB_N),   					//           .UB_N
-	// 	.sram_wire_CE_N_out(SRAM_CE_N),   					//           .CE_N
-	// 	.sram_wire_OE_N_out(SRAM_OE_N),   					//           .OE_N
-	// 	.sram_wire_WE_N_out(SRAM_WE_N)
-	// );
+		//outputs
+		// .sram_wire_DQ_out(SRAM_DQ),     					//  sram_wire.DQ
+		.sram_wire_ADDR_out(SRAM_ADDR),   					//           .ADDR
+		.sram_wire_LB_N_out(SRAM_LB_N),   					//           .LB_N
+		.sram_wire_UB_N_out(SRAM_UB_N),   					//           .UB_N
+		.sram_wire_CE_N_out(SRAM_CE_N),   					//           .CE_N
+		.sram_wire_OE_N_out(SRAM_OE_N),   					//           .OE_N
+		.sram_wire_WE_N_out(SRAM_WE_N)
+	);
 
 	// frameCount instance (
 	// 	//Maybe should be a submodule, keep track of current frame. 
@@ -240,7 +240,7 @@ module gifplayer_top (
 
 	// Hex display will display something.
 	hexdriver hexdrv0 (
-		.In(lookup_output[3:0]),
+		.In(DrawY[3:0]),
 		.Out(HEX0)
 	);
 	hexdriver hexdrv1 (

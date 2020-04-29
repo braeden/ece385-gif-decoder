@@ -3,7 +3,7 @@ module frame_manager (
     input logic [9:0] DrawX, DrawY,
     input logic VGA_CLK,
     input logic [257:0][31:0] lookup_table,
-    input logic [16:0] width, height,
+    input logic [15:0] width, height,
     input logic [8:0] totalFrameCount,
     input logic HARDWARE_EN,
     
@@ -38,33 +38,54 @@ module frame_manager (
                 currentFrameCount++;
             end
         end
+
+
+        if (HARDWARE_EN) begin
+            // sram_wire_ADDR = 8'bX;
+            if ({6'b0, DrawX} < width && {6'b0, DrawY} < height) begin //suspect
+                sram_wire_ADDR <= 19'h0;//19'h19450; //+(currentFrameCount*height*width)+DrawY*width+DrawX;
+                //fix this later to switch upper/lower bytes
+                currentColors = lookup_table[sram_wire_DQ[15:8]];
+                VGA_R <= currentColors[31:24];
+                VGA_G <= currentColors[23:16];
+                VGA_B <= currentColors[15:8];
+            end else begin 
+                VGA_R <= 8'hff;
+                VGA_G <= 8'b0;
+                VGA_B <= 8'b0;
+            end
+        end else begin
+            VGA_R <= 8'hff;
+            VGA_G <= 8'b0;
+            VGA_B <= 8'b0;
+        end
 	end
     always_comb
     begin
 
-        VGA_R = 8'b0;
-        VGA_G = 8'b0;
-        VGA_B = 8'b0;
-        sram_wire_WE_N = 1'b1; //False
-        sram_wire_UB_N = 1'b0; //T
-        sram_wire_LB_N = 1'b1; //F
-        sram_wire_CE_N = 1'b0; //T
-        sram_wire_OE_N = 1'b0; //T
-        currentColors = 32'b0;
-        sram_wire_ADDR = 19'b0;
+        // VGA_R = 8'hff;
+        // VGA_G = 8'b0;
+        // VGA_B = 8'b0;
+        sram_wire_WE_N = 1'b0; //False
+        sram_wire_UB_N = 1'b1; //T
+        sram_wire_LB_N = 1'b0; //F
+        sram_wire_CE_N = 1'b1; //T
+        sram_wire_OE_N = 1'b1; //T
+        // currentColors = 32'b0;
+        // sram_wire_ADDR = 19'b0;
         
-        if (HARDWARE_EN) begin
-            sram_wire_ADDR = 8'bX;
-            if (DrawX < width && DrawY < height) begin //suspect
-                sram_wire_ADDR = 19'h19450+(currentFrameCount*height*width)+DrawY*width+DrawX;
-                //fix this later to switch upper/lower bytes
-                currentColors = lookup_table[sram_wire_DQ[15:8]];
-                VGA_R = currentColors[31:24];
-                VGA_G = currentColors[23:16];
-                VGA_B = currentColors[15:8];
-            end
+        // if (HARDWARE_EN) begin
+        //     // sram_wire_ADDR = 8'bX;
+        //     if ({6'b0, DrawX} < width && {6'b0, DrawY} < height) begin //suspect
+        //         sram_wire_ADDR = 19'h0;//19'h19450; //+(currentFrameCount*height*width)+DrawY*width+DrawX;
+        //         //fix this later to switch upper/lower bytes
+        //         currentColors = lookup_table[sram_wire_DQ[15:8]];
+        //         VGA_R = currentColors[31:24];
+        //         VGA_G = currentColors[23:16];
+        //         VGA_B = currentColors[15:8];
+        //     end
 
-        end
+        // end
     end
 
 endmodule
