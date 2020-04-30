@@ -273,7 +273,7 @@ int main() {
 			ocmptr[i] = 0x00ffff00; //testing
 		}
 
-		ocmptr[255] = 0xffffff00;
+		ocmptr[255] = 0xff00ff00;
 
 //		for (int i = 0; i < readlGlobalColorSize; i++) {
 //			for (int j = 0; j < 3; j++) {

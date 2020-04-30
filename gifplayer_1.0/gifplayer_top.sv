@@ -93,6 +93,12 @@ module gifplayer_top (
 		height = lookup_output_array[9'd256][15:0];
 		frame_count = lookup_output_array[9'd257][31:24];
 		HARDWARE_EN = lookup_output_array[9'd257][0];
+		// if (HARDWARE_EN) begin
+		// 	SRAM_DQ = 16'bZ;
+		// end else begin
+		// 	SRAM_DQ = SRAM_DQ_SW;
+		// end
+		// SRAM_DQ = HARDWARE_EN ? 16'bZ : SRAM_DQ_SW;
 	end
 
 	// Instantiation of Qsys design
@@ -169,6 +175,8 @@ module gifplayer_top (
 		.Reset(Reset_h),
 		.VGA_CLK(VGA_CLK),
 		.lookup_table(lookup_output_array),
+		.DrawX(DrawX),
+		.DrawY(DrawY),
 		.width(width),
 		.height(height),
 		.totalFrameCount(frame_count),
