@@ -37,6 +37,7 @@ module gifplayer_soc_sram_0 (
 	read,
 	write,
 	writedata,
+	hardware,
 
 	// Bi-Directional
 	SRAM_DQ,
@@ -65,6 +66,8 @@ module gifplayer_soc_sram_0 (
 // Inputs
 input						clk;
 input						reset;
+
+input hardware;
 
 input			[19: 0]	address;
 input			[ 1: 0]	byteenable;
@@ -153,7 +156,7 @@ end
  *****************************************************************************/
 
 // Output Assignments
-assign SRAM_DQ	= (is_write) ? writedata_reg : 16'hzzzz;
+assign SRAM_DQ	= (is_write & ~hardware) ? writedata_reg : 16'hzzzz;
 
 // Internal Assignments
 

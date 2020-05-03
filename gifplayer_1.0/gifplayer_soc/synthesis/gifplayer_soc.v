@@ -24,7 +24,8 @@ module gifplayer_soc (
 		output wire          sram_wire_CE_N,            //              .CE_N
 		output wire          sram_wire_OE_N,            //              .OE_N
 		output wire          sram_wire_WE_N,            //              .WE_N
-		input  wire [7:0]    sw_wire_export             //       sw_wire.export
+		input  wire [7:0]    sw_wire_export,             //       sw_wire.export
+		input wire hardware
 	);
 
 	wire         sdram_pll_c0_clk;                                            // sdram_pll:c0 -> [mm_interconnect_0:sdram_pll_c0_clk, rst_controller_003:clk, sdram:clk]
@@ -207,6 +208,7 @@ module gifplayer_soc (
 		.SRAM_CE_N     (sram_wire_CE_N),                                           //                   .export
 		.SRAM_OE_N     (sram_wire_OE_N),                                           //                   .export
 		.SRAM_WE_N     (sram_wire_WE_N),                                           //                   .export
+		.hardware(hardware),
 		.address       (mm_interconnect_0_sram_0_avalon_sram_slave_address),       //  avalon_sram_slave.address
 		.byteenable    (mm_interconnect_0_sram_0_avalon_sram_slave_byteenable),    //                   .byteenable
 		.read          (mm_interconnect_0_sram_0_avalon_sram_slave_read),          //                   .read

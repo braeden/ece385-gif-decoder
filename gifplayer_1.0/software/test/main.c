@@ -8,8 +8,8 @@
 #include "structs.h"
 
 static char VALID_HEADER[3] = "GIF";
-static unsigned char *frameptr = (char *)0x00419450;
-static uint32_t *ocmptr = (uint32_t *)0x00001000;
+volatile static unsigned char *frameptr = (char *)0x00419450;
+volatile static uint32_t *ocmptr = (uint32_t *)0x00001000;
 static int ON_NIOS = 1;
 
 unsigned char *fileptr;
@@ -54,6 +54,14 @@ void writeSRAM() {
 	}
 }
 
+void eraseSRAM() {
+	static unsigned char *temp = (char *)0x00400000;
+	for (int i = 0; i<2000000; i++) {
+		temp[i] = 0x00;
+	}
+	//Probably slow af
+}
+
 void getControl() {
 	ocmptr[257] = 0;
 }
@@ -86,15 +94,15 @@ int main() {
 	 //Write SRAM if we want:
 	 writeSRAM();
 
-	//	for (int i = 0; i < 100; i++) {
-	//		printf("%02x, ", fileptr[i]);
-	//		if (!((i+1)%16)) {
-	//			printf("\n");
-	//		}
-	//	}
-	//	ocmptr[0] = 0x1234;
-	////
-	//	exit(0);
+//		for (int i = 0; i < 100; i++) {
+//			printf("%02x, ", fileptr[i]);
+//			if (!((i+1)%16)) {
+//				printf("\n");
+//			}
+//		}
+////		ocmptr[0] = 0x1234;
+//	//
+//		exit(0);
 
 	HeaderBlock header;
 	LSD descriptor;
@@ -226,8 +234,12 @@ int main() {
 		if (ON_NIOS) {
 			memcpy(frameptr + imgDesc.imgHeight*imgDesc.imgWidth * totalFrameCount, dataOut, imgDesc.imgHeight * imgDesc.imgWidth);
 		}
-		unsigned char * x = 0x00419450;
-		x[1] = 0x00;
+//		frameptr[0] = 0x00;
+//		frameptr[1] = 0x00;
+//		unsigned char * x = 0x00400000;
+//		x[0] = 0x01;
+//
+//		x[1] = 0x01;
 //		frameptr[0] = 0x00; //testing
 		 for (int i = 0; i < imgDesc.imgHeight * imgDesc.imgWidth; i++) {
 		 	if (i % imgDesc.imgWidth == 0) {
@@ -261,28 +273,40 @@ int main() {
 
 	if (ON_NIOS) {
 		for (int i = 0; i < 258; i++) {
-//			ocmptr[i] = 0;
-			ocmptr[i] = 0x00ff0000; //testing
+			ocmptr[i] = 0;
 		}
-		for (int i = 100; i < 258; i++) {
-//			ocmptr[i] = 0;
-			ocmptr[i] = 0xffff0000; //testing
-		}
-		for (int i = 200; i < 258; i++) {
-//			ocmptr[i] = 0;
-			ocmptr[i] = 0x00ffff00; //testing
-		}
-
-		ocmptr[255] = 0xff00ff00;
-
-//		for (int i = 0; i < readlGlobalColorSize; i++) {
-//			for (int j = 0; j < 3; j++) {
-//				ocmptr[i] += globalTable[i].RGB[j] << (24 - j * 8);
-//			}
+//		for (int i = 0; i < 256; i++) {
+//			ocmptr[i] = 0xff000000;
 //		}
-		ocmptr[256] = 0;
-		ocmptr[257] = 0;
-		ocmptr[0] = 0xffffffff; // testing
+//		for (int i = 25; i < 256; i++) {
+//			ocmptr[i] = 0x00ff0000; //testing
+//		}
+//		for (int i = 200; i < 256; i++) {
+////			ocmptr[i] = 0;
+//			ocmptr[i] = 0x0000ff00; //testing
+//		}
+//
+
+//		ocmptr[255] = 0x0000ff00;
+
+		for (int i = 0; i < readlGlobalColorSize; i++) {
+			for (int j = 0; j < 3; j++) {
+				ocmptr[i] += globalTable[i].RGB[j] << (24 - j * 8);
+				printf("%d: %08x\n", i, ocmptr[i]);
+
+			}
+			printf("final %d: %08x\n", i, ocmptr[i]);
+		}
+
+
+//				ocmptr[0] = 0x0000ff00;
+//				ocmptr[1] = 0x00ff0000;
+//				ocmptr[2] = 0xffff0000;
+//				ocmptr[3] = 0xffff0000;
+//		ocmptr[256] = 0;
+//		ocmptr[257] = 0;
+//		ocmptr[255] = 0xffff0000; // testing
+//		ocmptr[1] = 0xffffff00; // testing
 
 		ocmptr[256] += descriptor.canvasWidth << 16;
 		ocmptr[256] += descriptor.canvasHeight;

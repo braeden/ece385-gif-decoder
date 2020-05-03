@@ -124,7 +124,8 @@ module gifplayer_top (
 		.sram_wire_OE_N(SRAM_OE_N_SW),   					//           .OE_N
 		.sram_wire_WE_N(SRAM_WE_N_SW),   					//           .WE_N
 
-		.lookup_export_export_data(lookup_output)
+		.lookup_export_export_data(lookup_output),
+		.hardware(HARDWARE_EN)
 	);
 
 
@@ -182,7 +183,6 @@ module gifplayer_top (
 		.totalFrameCount(frame_count),
 		.HARDWARE_EN(HARDWARE_EN),
 
-
 		.sram_wire_DQ(SRAM_DQ),     					//  sram_wire.DQ
 		.sram_wire_ADDR(SRAM_ADDR_HW),   					//           .ADDR
 		.sram_wire_LB_N(SRAM_LB_N_HW),   					//           .LB_N
@@ -190,6 +190,8 @@ module gifplayer_top (
 		.sram_wire_CE_N(SRAM_CE_N_HW),   					//           .CE_N
 		.sram_wire_OE_N(SRAM_OE_N_HW),   					//           .OE_N
 		.sram_wire_WE_N(SRAM_WE_N_HW),   					//           .WE_N
+
+
 
 		.VGA_R(VGA_R),
 		.VGA_G(VGA_G),
