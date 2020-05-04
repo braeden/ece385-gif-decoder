@@ -56,6 +56,7 @@ module gifplayer_top (
 	logic [15:0] height;
 	logic [7:0] frame_count;
 	logic HARDWARE_EN;
+	logic [7:0] cur_frame_count;
 
 	// SRAM Interface for Nios II Software
 	wire  [15:0] SRAM_DQ_SW; 
@@ -182,6 +183,8 @@ module gifplayer_top (
 		.height(height),
 		.totalFrameCount(frame_count),
 		.HARDWARE_EN(HARDWARE_EN),
+		.key(SW[0]),
+		.speed_en(SW[1]),
 
 		.sram_wire_DQ(SRAM_DQ),     					//  sram_wire.DQ
 		.sram_wire_ADDR(SRAM_ADDR_HW),   					//           .ADDR
@@ -195,7 +198,8 @@ module gifplayer_top (
 
 		.VGA_R(VGA_R),
 		.VGA_G(VGA_G),
-		.VGA_B(VGA_B)
+		.VGA_B(VGA_B),
+		.current_frame_out(cur_frame_count)
 	);
 
 
@@ -249,38 +253,42 @@ module gifplayer_top (
 
 
 	// Hex display will display something.
-	hexdriver hexdrv0 (
-		.In(DrawY[3:0]),
-		.Out(HEX0)
+	hexdriver hexdrv6 (
+		.In(cur_frame_count[3:0]),
+		.Out(HEX6)
 	);
-	hexdriver hexdrv1 (
-		.In(lookup_output[7:4]),
-		.Out(HEX1)
+	hexdriver hexdrv7 (
+		.In(cur_frame_count[7:4]),
+		.Out(HEX7)
+	);
+	hexdriver hexdrv4 (
+		.In(frame_count[3:0]),
+		.Out(HEX4)
+	);
+	hexdriver hexdrv5 (
+		.In(frame_count[7:4]),
+	   .Out(HEX5)
 	);
 	hexdriver hexdrv2 (
-		.In(lookup_output[11:8]),
+		.In(width[3:0]),
 	   .Out(HEX2)
 	);
 	hexdriver hexdrv3 (
-		.In(width[3:0]),
+		.In(width[7:4]),
 	   .Out(HEX3)
 	);
-	hexdriver hexdrv4 (
-		.In(width[7:4]),
-	   .Out(HEX4)
+	hexdriver hexdrv0 (
+		.In(HARDWARE_EN),//height[3:0]),
+	   .Out(HEX0)
 	);
-	hexdriver hexdrv5 (
-		.In(height[3:0]),
-	   .Out(HEX5)
-	);
-	hexdriver hexdrv6 (
+	hexdriver hexdrv1 (
 		.In(height[7:4]),
-	   .Out(HEX6)
+	   .Out(HEX1)
 	);
-	hexdriver hexdrv7 (
-		.In(HARDWARE_EN),
-	   .Out(HEX7)
-	);
+	// hexdriver hexdrv0 (
+	// 	.In(HARDWARE_EN),
+	//    .Out(HEX7)
+	// );
 
 endmodule
 
