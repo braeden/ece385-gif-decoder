@@ -1,6 +1,7 @@
 
 module gifplayer_soc (
 	clk_clk,
+	lookup_export_export_data,
 	reset_reset_n,
 	sdram_clk_clk,
 	sdram_wire_addr,
@@ -19,10 +20,10 @@ module gifplayer_soc (
 	sram_wire_CE_N,
 	sram_wire_OE_N,
 	sram_wire_WE_N,
-	sw_wire_export,
-	lookup_export_export_data);	
+	sw_wire_export);	
 
 	input		clk_clk;
+	output	[8255:0]	lookup_export_export_data;
 	input		reset_reset_n;
 	output		sdram_clk_clk;
 	output	[12:0]	sdram_wire_addr;
@@ -42,5 +43,4 @@ module gifplayer_soc (
 	output		sram_wire_OE_N;
 	output		sram_wire_WE_N;
 	input	[7:0]	sw_wire_export;
-	output	[8255:0]	lookup_export_export_data;
 endmodule

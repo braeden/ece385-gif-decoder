@@ -24,6 +24,11 @@
          value = "8";
          type = "int";
       }
+      datum sopceditor_expanded
+      {
+         value = "0";
+         type = "boolean";
+      }
    }
    element jtag_uart_0
    {
@@ -222,7 +227,7 @@
   <parameter name="inputClockFrequency" value="0" />
   <parameter name="resetSynchronousEdges" value="NONE" />
  </module>
- <module name="fast_clk" kind="clock_source" version="18.1" enabled="1">
+ <module name="fast_clk" kind="clock_source" version="18.1" enabled="0">
   <parameter name="clockFrequency" value="100000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="50000000" />
@@ -794,7 +799,7 @@
  <connection kind="clock" version="18.1" start="clk_0.clk" end="nios2_gen2_0.clk" />
  <connection kind="clock" version="18.1" start="clk_0.clk" end="jtag_uart_0.clk" />
  <connection kind="clock" version="18.1" start="clk_0.clk" end="switches.clk" />
- <connection kind="clock" version="18.1" start="fast_clk.clk" end="sram_0.clk" />
+ <connection kind="clock" version="18.1" start="clk_0.clk" end="sram_0.clk" />
  <connection kind="clock" version="18.1" start="clk_0.clk" end="fast_clk.clk_in" />
  <connection
    kind="clock"

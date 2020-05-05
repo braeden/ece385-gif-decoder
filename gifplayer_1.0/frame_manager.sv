@@ -28,19 +28,21 @@ module frame_manager (
     logic [7:0] currentFrameCount = 0;
     logic [31:0] currentColors;
     logic [15:0] data_out;
+    //logic [11:0] sram_offset;
     logic access_upper = 0;
 
     always_ff @ (posedge VGA_CLK)
     begin
-        access_upper <= DrawX == 10'b0 ? 1'b0 : ~access_upper; // why we have fish
-        displayCount <= displayCount + 1;
+        access_upper <= DrawX == 10'b0 ? 1'b0 : ~access_upper;
+        //access_upper <= sram_offset[0];
+        displayCount <= displayCount + 1'b1;
 
         if ((speed_en && displayCount >= 26'd12500000) || (~speed_en && displayCount == ~26'b0)) begin
             displayCount <= 26'b0;
             if (totalFrameCount <= currentFrameCount) begin
                 currentFrameCount <= 8'b0;
             end else begin
-                currentFrameCount <= currentFrameCount + 1;
+                currentFrameCount <= currentFrameCount + 1'b1;
             end
         end
     end
@@ -51,42 +53,11 @@ module frame_manager (
         //     currentFrameCount <= 1'b0;
         // end
         data_out <= sram_wire_DQ;
-        // if (VGA_CLK) begin
-        //     access_upper = DrawX == 10'b0 ? 1'b0 : ~access_upper;
-        //     displayCount++;
-        //     if ((speed_en && displayCount >= 26'd12500000) || (~speed_en && displayCount == 26'b1)) begin
-        //         displayCount <= 26'b0;
-        //         if (totalFrameCount >= currentFrameCount) begin
-        //             currentFrameCount <= 8'b0;
-        //         end else begin
-        //             currentFrameCount++;
-        //         end
-        //     end
-        // end
-
-        // if (HARDWARE_EN) begin
-        //     // sram_wire_ADDR = 8'bX;
-        //     if ( unsigned'(DrawX) < unsigned'(width) && unsigned'(DrawY) < unsigned'(height)) begin //suspect
-        //         sram_wire_ADDR <= 19'h0;//19'h19450; //+(currentFrameCount*height*width)+DrawY*width+DrawX;
-        //         //fix this later to switch upper/lower bytes
-        //         currentColors = lookup_table[sram_wire_DQ[15:8]];
-        //         VGA_R <= currentColors[31:24];
-        //         VGA_G <= currentColors[23:16];
-        //         VGA_B <= currentColors[15:8];
-        //     end else begin 
-        //         VGA_R <= 8'hff;
-        //         VGA_G <= 8'b0;
-        //         VGA_B <= 8'b0;
-        //     end
-        // end else begin
-        //     VGA_R <= 8'hff;
-        //     VGA_G <= 8'b0;
-        //     VGA_B <= 8'b0;
-        // end
 	end
 
     always_comb 
     begin
+        //sram_offset = 12'b0;
         current_frame_out = currentFrameCount;
         VGA_R = 8'h3f; 
         VGA_G = 8'h7f - {1'b0, DrawY[9:3]};
@@ -103,10 +74,15 @@ module frame_manager (
 
         if (HARDWARE_EN) begin
             // sram_wire_ADDR = 8'bX;
-
             if ( (unsigned'(DrawX) < unsigned'(width)) && (unsigned'(DrawY) < unsigned'(height)) ) begin
-                sram_wire_ADDR = 19'hCA28+((DrawY*width+DrawX)>>1)+((currentFrameCount*height*width)>>1);
+
+                //sram_offset = DrawY*width + DrawX + currentFrameCount*height*width;
+                //sram_wire_ADDR = 19'hCA28 + (sram_offset>>1);
+
+                sram_wire_ADDR = 19'hCA28 + ((DrawY*width + DrawX)>>1) + ((currentFrameCount*height*width)>>1);
+                //sram_wire_ADDR = (2*19'hCA28 + DrawY*width + DrawX + currentFrameCount*height*width)>>1; // This is the working one
                 //sram_wire_ADDR = 19'h0;//19'h19450; //+(currentFrameCount*height*width)+DrawY*width+DrawX;
+
                 //fix this later to switch upper/lower bytes
                 if (access_upper == key) begin
                     currentColors = lookup_table[data_out[15:8]];

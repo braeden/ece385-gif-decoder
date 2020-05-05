@@ -592,7 +592,6 @@ set_location_assignment PIN_D9 -to EXT_IO[6]
 set_global_assignment -name SYSTEMVERILOG_FILE vga_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sram_mux.sv
 set_global_assignment -name SYSTEMVERILOG_FILE lookup_reg.sv
-set_global_assignment -name SYSTEMVERILOG_FILE frame_state_machine.sv
 set_global_assignment -name SYSTEMVERILOG_FILE frame_manager.sv
 set_global_assignment -name QIP_FILE vga_clk.qip
 set_global_assignment -name SYSTEMVERILOG_FILE hexdriver.sv

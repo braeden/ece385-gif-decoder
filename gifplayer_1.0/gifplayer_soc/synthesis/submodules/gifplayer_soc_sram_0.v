@@ -39,6 +39,7 @@ module gifplayer_soc_sram_0 (
 	writedata,
 	hardware,
 
+
 	// Bi-Directional
 	SRAM_DQ,
 
@@ -67,14 +68,13 @@ module gifplayer_soc_sram_0 (
 input						clk;
 input						reset;
 
-input hardware;
-
 input			[19: 0]	address;
 input			[ 1: 0]	byteenable;
 input						read;
 input						write;
 input			[15: 0]	writedata;
 
+input hardware;
 // Bi-Directional
 inout			[15: 0]	SRAM_DQ;		// SRAM Data bus 16 Bits
 
